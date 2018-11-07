@@ -1,6 +1,5 @@
 """Utility file to seed ratings database from MovieLens data in seed_data/"""
 
-import datetime
 import csv
 from sqlalchemy import func
 from model import User
@@ -11,29 +10,28 @@ from model import connect_to_db, db
 from server import app
 
 
-# def load_users():
-#     """Load users from ratings.csv into database."""
+def load_users():
+    """Load users from ratings.csv into database."""
 
-#     print("Users")
+    print("Users")
 
-#     # Delete all rows in table, so if we need to run this a second time,
-#     # we won't be trying to add duplicate users
-#     User.query.delete()
+    # Delete all rows in table, so if we need to run this a second time,
+    # we won't be trying to add duplicate users
+    User.query.delete()
 
-#     # Read u.user file and insert data
-#     for row in open("seed_data/u.user"):
-#         row = row.rstrip()
-#         user_id, age, gender, occupation, zipcode = row.split("|")
 
-#         user = User(user_id=user_id,
-#                     age=age,
-#                     zipcode=zipcode)
+    for num in range(53425): #this is particular to this data-set, where our only user_id info is coming from the ratings file which 
+        user_id = num
 
-#         # We need to add to the session or it won't ever be stored
-#         db.session.add(user)
+        user = User(user_id=user_id)
 
-#     # Once we're done, we should commit our work
-#     db.session.commit()
+
+
+        # We need to add to the session or it won't ever be stored
+        db.session.add(user)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
 
 
 def load_books():
@@ -45,7 +43,7 @@ def load_books():
     Book.query.delete()
 
     #Read books file and insert data
-    with open("seed_data/bookssorted.csv") as csvfile:
+    with open("seed_data/books_in_eng.csv") as csvfile:
         try:
             dialect = csv.Sniffer().sniff(csvfile.read(1024))
         except:
@@ -81,47 +79,71 @@ def load_books():
         db.session.commit()
 
 
+def load_ratings():
+    """Load ratings from ratings.csv into database."""
+
+    print("Ratings")
+
+    Rating.query.delete()
+
+    with open('seed_data/splitfile_1.csv', encoding='utf-16') as csvfile:
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        except:
+            dialect = 'excel'
+
+        csvfile.seek(0)
+        reader = csv.reader(csvfile, dialect)
+        next(csvfile) #skips first row of the csv file
+        for row in reader:
+            book_id = row[1]
+            user_id = row[0]
+            score = row[2]
+                
+            user_id = int(user_id)
+            book_id = int(book_id)
+            score = int(score)
+
+            rating = Rating(user_id=user_id,
+                            book_id=book_id,
+                            score=score)
+
+            #We need to add to the session or it won't ever be store
+
+            book_in_db = Book.query.get(book_id)
+            user_in_db = User.query.get(user_id)
+            if book_in_db and user_in_db:
+                db.session.add(rating)
+                print("Rating for " + str(rating.book_id) + " added to database")
+            
+        db.session.commit()
 
 
 
-# def load_ratings():
-#     """Load ratings from u.data into database."""
 
-#     print("Ratings")
+def set_val_user_id():
+    """Set value for the next user_id after seeding database"""
 
-#     Rating.query.delete()
+    # Get the Max user_id in the database
+    result = db.session.query(func.max(User.user_id)).one()
+    max_id = int(result[0])
 
-#     with open("seed_data/u.data") as file:
-#         for row in file:
-#             row = row.rstrip()
-#             (user_id, movie_id, score, timestamp) = row.split("\t")
+    # Set the value for the next user_id to be max_id + 1
+    query = "SELECT setval('users_user_id_seq', :new_id)"
+    db.session.execute(query, {'new_id': max_id + 1})
+    db.session.commit()
 
-#             user_id = int(user_id)
-#             movie_id = int(movie_id)
-#             score = int(score)
+def set_val_rating_id():
+    """Set value for the next rating_id after seeding database"""
 
-#             rating = Rating(user_id=user_id,
-#                             movie_id=movie_id,
-#                             score=score)
+    #Get the Max rating_id in the database
+    result = db.session.query(func.max(Rating.rating_id)).one()
+    max_id = int(result[0])
 
-#             #We need to add to the session or it won't ever be store
-#             db.session.add(rating)
-
-#         db.session.commit()
-
-
-
-# def set_val_user_id():
-#     """Set value for the next user_id after seeding database"""
-
-#     # Get the Max user_id in the database
-#     result = db.session.query(func.max(User.user_id)).one()
-#     max_id = int(result[0])
-
-#     # Set the value for the next user_id to be max_id + 1
-#     query = "SELECT setval('users_user_id_seq', :new_id)"
-#     db.session.execute(query, {'new_id': max_id + 1})
-#     db.session.commit()
+    #Set the value for the next rating_id to be max_id +1
+    query = "SELECT setval('ratings_rating_id_seq', :new_id)"
+    db.session.execute(query, {'new_id': max_id + 1})
+    db.session.commit()
 
 
 if __name__ == "__main__":
@@ -131,9 +153,10 @@ if __name__ == "__main__":
     db.create_all()
 
 
-    # sniff_dialect()
+
     # Import different types of data
-    # load_users()
+    load_users()
     load_books()
-    # load_ratings()
-    # set_val_user_id()
+    load_ratings()
+    set_val_user_id()
+    set_val_rating_id()
