@@ -37,9 +37,13 @@ def register_for_site():
     email = request.form['email']
     password = request.form['password']
 
-    new_user = User(email=email, password=password)
+    if email in User.query.all():
+        flash("You already have an account. Please log in.")
 
-    db.session.add(new_user)
+    else:
+        new_user = User(email=email, password=password)
+
+        db.session.add(new_user)
     db.session.commit()
 
     return redirect('/')
@@ -57,7 +61,7 @@ def login_process():
     email = request.form['email']
     password = request.form['password']
 
-    user = User.query.filter_by(email = email).first()
+    user = User.query.filter(User.email == email).first()
 
     if not user:
         flash("You are not yet registered!")
@@ -67,7 +71,8 @@ def login_process():
         flash("That's not the right password. Try again?")
         return redirect('/login')
 
-    session['user_id'] = user.user_id
+    else:
+        session['user_id'] = user.user_id
 
     flash('Welcome!')
     return redirect(f'/users/{user.user_id}')
@@ -91,6 +96,67 @@ def user_detail(user_id):
 
     user = User.query.get(user_id)
     return render_template('user.html', user=user)
+
+@app.route('/books')
+def show_books():
+    """Show a book list."""
+
+    books = Book.query.order_by('title').all()
+
+    return render_template('book_list.html', books=books)
+
+@app.route('/books/<int:book_id>', methods=['GET'])
+def show_book_details(book_id):
+
+    book = Book.query.get(book_id)
+
+    user_id = session.get('user_id')
+
+    if user_id:
+        #get user rating
+        user_rating = Rating.query.filter_by(book_id=book_id, user_id=user_id).first()
+    else:
+        user_rating = None
+
+    #Get avg rating of book
+
+    rating_scores = [r.score for r in book.ratings]
+    if len(rating_scores) > 0:
+        avg_rating = float(sum(rating_scores))/len(rating_scores) #need to format
+    else:
+        avg_rating = None
+
+
+    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating)
+
+@app.route('/books/<int:book_id>', methods=['POST'])
+def set_rating(book_id):
+
+    score = int(request.form.get('submitted_rating'))
+    user_id = session.get('user_id')
+    if not user_id:
+        raise Exception("You aren't logged in!")
+
+    #check for existing rating    
+    user_rating = Rating.query.filter_by(user_id=user_id, book_id=book_id).first()
+    
+
+    if user_rating: #if the rating object exists in the database
+        user_rating.score = score #then update the score
+        flash("You've updated your rating!")
+        db.session.add(user_rating)
+        db.session.commit()
+
+    
+    else:# if the rating object does not exist yet
+        user_rating = Rating(user_id=user_id, book_id=book_id, score=score)
+        flash("Thank you for rating!")
+
+        db.session.add(user_rating)
+
+        db.session.commit()
+
+    return redirect(f'/books/{book_id}')
 
 
 
