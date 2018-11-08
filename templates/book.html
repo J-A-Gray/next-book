@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>{{ book.title }}</h1>
+
+<!--   <p>Average rating: {{ average }}</p>
+ -->
+  
+  {% if "user_id" in session %}
+      <h2>Your Rating</h2>
+
+    {% if user_rating and user_rating != None %}
+        <p>You rated {{ book.title }} a {{ user_rating.score }}/5</p>
+
+    {% endif %}
+      <h2>Rate {{ book.title }}!</h2>
+      <form action="/books/{{ book.book_id }}" method="POST">
+          <label>Rating:</label>
+          <input type="radio" name="submitted_rating" value="1"> 1
+          <input type="radio" name="submitted_rating" value="2"> 2
+          <input type="radio" name="submitted_rating" value="3"> 3
+          <input type="radio" name="submitted_rating" value="4"> 4
+          <input type="radio" name="submitted_rating" value="5"> 5
+          <input type="submit" value="Rate">
+          <input type="submit" value="Rate">
+      </form>
+
+  {% endif %}
+
+  {% if movie.ratings %}
+      <h2>Past Ratings By All Users</h2>
+      <ul>
+        {% for rating in book.ratings %}
+          <li>
+            <a href="/users/{{ rating.user_id }}">{{ rating.user_id }}</a>
+                rated {{ rating.score }}/5
+          </li>
+        {% endfor %}
+      </ul>
+  {% endif %}
+
+
+
+{% endblock %}

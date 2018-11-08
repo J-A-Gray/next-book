@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NextBook</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+</head>
+
+
+<body>
+    NextBook
+    {% if 'user_id' in session %}
+        <a href='/logout' style='background-color: powderblue'>Log out</a>
+    
+    {% else %}
+        <a href='/login' style='background-color: powderblue'>Log in</a>
+    {% endif %}
+        
+    <hr>
+
+    {% for flash in get_flashed_messages() %}
+        {{ flash }}
+    {% endfor %}
+    
+    {% block content %} content goes here {% endblock %}
+
+</body>
+</html>

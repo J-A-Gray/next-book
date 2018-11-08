@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>User: {{ user.user_id }} </h1>
+  <h1>Email: {{ user.email }}</h1>
+
+  {% if user.ratings %}
+
+    <h2>Books You've Rated</h2>
+
+    <ul>
+    {% for rating in user.ratings %}
+      <li>
+        <a href="/books/{{ rating.book_id }}">{{ rating.book.title }}</a>
+        was rated {{ rating.score }}
+      </li>
+    {% endfor %}
+    </ul>
+
+  {% endif %}
+
+{% endblock %}
