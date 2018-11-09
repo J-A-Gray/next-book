@@ -56,7 +56,7 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
     """Create a dictionary of Book objects rated by neighbors of user but not in users input"""
 
     neighbors_book_dict = {}
-    for neighbor in neighbors_lst:
+    for neighbor in neighbors_user_id_lst:
         user = User.query.get(int(neighbor))
 
         ratings = Rating.query.filter_by(user_id=user.user_id).all()
@@ -92,11 +92,14 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
 
     while len(recommendation_lst) < 5:
 
-        for num in range(num_neighbors, 0, -1):
-            if len(times_recomended[num]) > 0:
-                k = 0
-                recommendation_lst.append(times_recomended[num][k])
-                k += 1
+        for num in range(num_neighbors, 0, -1): #range goes from length of neighbors to zero, counting backwards
+            if len(times_recomended[num]) > 0: #non empty nested lists
+                for book in times_recomended[num]:
+                    if book not in recommendation_lst and len(recommendation_lst) < 5:
+                        recommendation_lst.append(book)
+                        print(book)
+
+
     return recommendation_lst
     
 
@@ -105,11 +108,6 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
 
 
 
-user_book_lst = create_user_list(2689)
-neighbors_lst = get_nearest_neighbors(2689)
-# neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
-neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
-print(get_recommendations_lst(neighbors_dict))
 
 
 

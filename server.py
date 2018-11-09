@@ -10,7 +10,7 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst
 
 
 app = Flask(__name__)
@@ -210,10 +210,16 @@ def process_books():
 def display_favorite_books():
 
     user_id = session.get('user_id')
-    neighbors = get_nearest_neighbors(user_id)
+    neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
+    
+    #from database_functions.py
+    user_book_lst = create_user_list(int(user_id))
+    neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
+    recommendation_lst = get_recommendations_lst(neighbors_dict)
+    print(recommendation_lst)
 
 
-    return render_template('loved_books_result.html')
+    return render_template('loved_books_result.html', recommendation_lst=recommendation_lst)
 
 
 if __name__ == "__main__":

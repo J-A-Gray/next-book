@@ -58,9 +58,9 @@ pass new ratings file to Surprise !!!Memory limitations!!! It will not currently
 Get neighbors: ////The process above ////
 
 After this process:
-user_neighbors each have books they have reviewed positively (let's assume 5/5)
-create one dictionary of book_ids from user_neighbors, (hopefully some books recommended by multiple neighbors),
-get the five most popular book_ids
+user_neighbors each have books they have reviewed positively (let's assume 5/5) DONE
+create one dictionary of book_ids from user_neighbors, (hopefully some books recommended by multiple neighbors), D
+get the five most popular book_ids DONE
 query database for title, author, isbn associated with those book_ids
 display list (eventually rich content based on API call with ISBN); 
 but for now list pf 5 books with title, author ISBN from database
