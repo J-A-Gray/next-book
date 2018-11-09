@@ -99,14 +99,14 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
                 k += 1
     return recommendation_lst
     
-    
 
 
 
 
 
-user_book_lst = create_user_list(546)
-neighbors_lst = get_nearest_neighbors(546)
+
+user_book_lst = create_user_list(2689)
+neighbors_lst = get_nearest_neighbors(2689)
 # neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
 neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
 print(get_recommendations_lst(neighbors_dict))
