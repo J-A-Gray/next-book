@@ -48,11 +48,11 @@ def get_nearest_neighbors(user_id):
 
 """ 
 Pre this calculation:
-take in ISBNs for five books
-query database for matching book_ids
-create user_id, 5 rating_ids that have new user_id and each book_id and scores of 5
-generate ratings csv file that has new user's ratings! (was using static data file previously)
-pass new ratings file to Surprise !!!Memory limitations!!! It will not currently process the 6M ratings file:
+take in ISBNs for five books - DONE
+query database for matching book_ids _ DONE
+create user_id, 5 rating_ids that have new user_id and each book_id and scores of 5 - DONE
+generate ratings csv file that has new user's ratings! (was using static data file previously) _ DONE
+pass new ratings file to Surprise !!!Memory limitations!!! It will not currently process the 6M ratings file: - DONE
     how to split on the fly OR how to generate partial set that still contains new user's ratings?
 
 Get neighbors: ////The process above ////

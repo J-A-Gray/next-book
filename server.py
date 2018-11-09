@@ -200,11 +200,18 @@ def process_books():
     #write csv file to send to Surprise library
     write_rating_data()
 
+    #set user_id in session
+    session['user_id'] = anon_id
+
 
     return redirect('/lovedbooksresults')
 
 @app.route('/lovedbooksresults', methods=['GET'])
 def display_favorite_books():
+
+    user_id = session.get('user_id')
+    neighbors = get_nearest_neighbors(user_id)
+    
 
     return render_template('loved_books_result.html')
 

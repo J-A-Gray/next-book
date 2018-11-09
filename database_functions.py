@@ -1,4 +1,5 @@
 from model_testing import *
+from ml import get_nearest_neighbors
 
 init_app()
 
@@ -39,6 +40,51 @@ def add_rating(user_id, book_id, score=5):
     db.session.add(rating)
     db.session.commit()
 
+def create_user_list(user_id):
+    """Create a list of books rated by the user"""
+    user_book_lst=[]
+    ratings = Rating.query.filter_by(user_id=user_id).all()
+    
+    for rating in ratings:
+        book_id = rating.book_id
+        book = Book.query.filter(Book.book_id==book_id).first()
+        user_book_lst.append(book)
+
+    return user_book_lst
+
+def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
+    """Create a dictionary of Book objects rated by neighbors of user but not in users input"""
+
+    neighbors_book_dict = {}
+    for neighbor in neighbors_lst:
+        user = User.query.get(int(neighbor))
+
+        ratings = Rating.query.filter_by(user_id=user.user_id).all()
+
+        for rating in ratings:
+            if rating.score == score:
+                book_id = rating.book_id
+                book = Book.query.filter(Book.book_id==book_id).first()
+
+                if neighbors_book_dict.get(book):
+                    neighbors_book_dict[book] += 1
+                else:
+                    neighbors_book_dict[book] = 1
+
+    return neighbors_book_dict
+
+
+
+
+user_book_lst = create_user_list(546)
+neighbors_lst = get_nearest_neighbors(546)
+# neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
+print(create_neighbors_book_dict(neighbors_lst, user_book_lst, 5))
+
+
+
+
+
 
 
 # user = add_anon_user()
@@ -60,6 +106,12 @@ def add_rating(user_id, book_id, score=5):
 # rating = add_rating(user_id, book_id)
 # print(rating)
 
+
+# for book in books:
+#     print(book)
+
+# for book in books:
+#     print(book)
 """
 6161413
 6178731
