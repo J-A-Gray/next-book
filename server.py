@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
+from ml import get_nearest_neighbors
 
 
 from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating
