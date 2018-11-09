@@ -74,14 +74,43 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
     
     return neighbors_book_dict
 
+def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
+
+    times_recomended = {}
+    for num in range(num_neighbors, 0, -1):
+        times_recomended[num] = list()
+    print(times_recomended)
+
+    tuples = neighbors_book_dict.items()
+    for item in tuples:
+        if item[1] in times_recomended:
+            times_recomended[item[1]].append(item[0])
+
+    print(times_recomended)
+
+    recommendation_lst = []
+
+    while len(recommendation_lst) < 5:
+
+        for num in range(num_neighbors, 0, -1):
+            if len(times_recomended[num]) > 0:
+                k = 0
+                recommendation_lst.append(times_recomended[num][k])
+                k += 1
+    return recommendation_lst
+    
+    
+
+
 
 
 
 user_book_lst = create_user_list(546)
-print(user_book_lst)
-# neighbors_lst = get_nearest_neighbors(546)
+neighbors_lst = get_nearest_neighbors(546)
 # neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
-# print(create_neighbors_book_dict(neighbors_lst, user_book_lst, 5))
+neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
+print(get_recommendations_lst(neighbors_dict))
+
 
 
 
