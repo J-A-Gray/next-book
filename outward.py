@@ -4,10 +4,10 @@ import csv
 from sqlalchemy import func
 from model import User
 from model import Rating
-from model import Book
+from model import Book, User, Rating
 
-from model import connect_to_db, db
-from server import app
+# from model import connect_to_db, db
+# from server import app
 
 
 
@@ -20,7 +20,6 @@ def write_rating_data():
             out.writerow([item.user_id, item.book_id, item.score])
 
 
-if __name__ == "__main__":
-    connect_to_db(app)
+# if __name__ == "__main__":
+#     connect_to_db(app)
 
-write_rating_data()

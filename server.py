@@ -6,6 +6,10 @@ from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db, User, Book, Rating
+from outward import write_rating_data
+
+
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating
 
 
 app = Flask(__name__)
@@ -158,9 +162,50 @@ def set_rating(book_id):
 
     return redirect(f'/books/{book_id}')
 
+@app.route('/lovedbooks', methods=['GET'])
+def book_form():
+
+    return render_template('reference_books.html')
+
+@app.route('/lovedbooks', methods=['POST'])
+def process_books():
+
+    b1 = request.form['book1']
+    b2 = request.form['book2']
+    b3 = request.form['book3']
+    b4 = request.form['book4']
+    b5 = request.form['book5']
+
+    # create a user to hold ratings
+    anon_user = add_anon_user()
+
+    # query db to get user id
+    anon_id = get_last_user_id()
+
+    # query db to get book_ids
+    book1_id = get_book_id(str(b1))
+    book2_id = get_book_id(str(b2))
+    book3_id = get_book_id(str(b3))
+    book4_id = get_book_id(str(b4))
+    book5_id = get_book_id(str(b5))
+
+    #add ratings to db
+    add_rating(anon_id, book1_id)
+    add_rating(anon_id, book2_id)
+    add_rating(anon_id, book3_id)
+    add_rating(anon_id, book4_id)
+    add_rating(anon_id, book5_id)
+
+    #write csv file to send to Surprise library
+    write_rating_data()
 
 
+    return redirect('/lovedbooksresults')
 
+@app.route('/lovedbooksresults', methods=['GET'])
+def display_favorite_books():
+
+    return render_template('loved_books_result.html')
 
 
 if __name__ == "__main__":

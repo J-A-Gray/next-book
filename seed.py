@@ -1,4 +1,4 @@
-"""Utility file to seed ratings database from MovieLens data in seed_data/"""
+"""Utility file to seed ratings database from Goodbooks-10K data in seed_data/"""
 
 import csv
 from sqlalchemy import func
