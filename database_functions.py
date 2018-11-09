@@ -65,21 +65,23 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
             if rating.score == score:
                 book_id = rating.book_id
                 book = Book.query.filter(Book.book_id==book_id).first()
+                if book not in user_book_lst:
+                    if neighbors_book_dict.get(book):
+                        neighbors_book_dict[book] += 1
+                    else:
+                        neighbors_book_dict[book] = 1
 
-                if neighbors_book_dict.get(book):
-                    neighbors_book_dict[book] += 1
-                else:
-                    neighbors_book_dict[book] = 1
-
+    
     return neighbors_book_dict
 
 
 
 
 user_book_lst = create_user_list(546)
-neighbors_lst = get_nearest_neighbors(546)
+print(user_book_lst)
+# neighbors_lst = get_nearest_neighbors(546)
 # neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
-print(create_neighbors_book_dict(neighbors_lst, user_book_lst, 5))
+# print(create_neighbors_book_dict(neighbors_lst, user_book_lst, 5))
 
 
 
