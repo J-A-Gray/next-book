@@ -4,6 +4,7 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
+import os
 
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
@@ -14,6 +15,8 @@ from database_functions import add_anon_user, get_last_user_id, get_last_rating_
 
 
 app = Flask(__name__)
+
+GBOOKS_key = os.environ.get("GBOOKS")
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
