@@ -62,9 +62,21 @@ class Rating(db.Model):
 
 ##############################################################################
 # Helper functions
+def init_app():
+    from flask import Flask
+    app = Flask(__name__)
+
+    connect_to_db(app)
+    print("Connected to DB.")
+
+
+
 
 def example_data():
     """Populate a databse with sample data for testing purposes."""
+
+    db.create_all()
+
 
     #Empty out data from previous runs
     User.query.delete()
@@ -106,12 +118,11 @@ def example_data():
                         rating5, rating6, rating7, rating8, rating9, rating10])
     db.session.commit()
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri='postgresql:///nextbook'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///nextbook'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     db.app = app
     db.init_app(app)
 
@@ -121,5 +132,5 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     from server import app
-    connect_to_db(app)
-    print("Connected to DB.")
+    init_app()
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

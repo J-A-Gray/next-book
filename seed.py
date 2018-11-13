@@ -108,7 +108,7 @@ def load_ratings():
                             book_id=book_id,
                             score=score)
 
-            #We need to add to the session or it won't ever be store
+            #We need to add to the session or it won't ever be stored
 
             book_in_db = Book.query.get(book_id)
             user_in_db = User.query.get(user_id)

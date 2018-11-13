@@ -63,7 +63,7 @@ create one dictionary of book_ids from user_neighbors, (hopefully some books rec
 get the five most popular book_ids DONE
 query database for title, author, isbn associated with those book_ids
 display list (eventually rich content based on API call with ISBN); 
-but for now list pf 5 books with title, author ISBN from database
+but for now list pf 5 books with title, author ISBN from database DONE
 
 """
 

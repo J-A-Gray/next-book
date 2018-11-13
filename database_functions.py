@@ -1,25 +1,24 @@
-from model_testing import *
-from ml import get_nearest_neighbors
-
-init_app()
+from model import *
 
 def add_anon_user():
     """Adds a user_id for a non-logged in user from the landing page."""
 
     next_id = get_last_user_id() + 1
-    intake_user = User(user_id = next_id)
-    db.session.add(intake_user)
+    anon_user = User(user_id = next_id)
+    db.session.add(anon_user)
     db.session.commit()
 
+    return anon_user
+
 def get_last_user_id():
-    """Queries database for last created user id."""
+    """Query database for last created user id."""
 
     user = User.query.order_by(User.user_id.desc()).first()
 
     return user.user_id
 
 def get_last_rating_id():
-    """Queries database for last created rating id."""
+    """Query database for last created rating id."""
 
     rating = Rating.query.order_by(Rating.rating_id.desc()).first()
 
@@ -39,6 +38,8 @@ def add_rating(user_id, book_id, score=5):
     rating = Rating(rating_id=next_rating_id, user_id=user_id, book_id=book_id, score=score)
     db.session.add(rating)
     db.session.commit()
+
+    return rating
 
 def create_user_list(user_id):
     """Create a list of books rated by the user"""
@@ -79,14 +80,12 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
     times_recomended = {}
     for num in range(num_neighbors, 0, -1):
         times_recomended[num] = list()
-    print(times_recomended)
 
     tuples = neighbors_book_dict.items()
     for item in tuples:
         if item[1] in times_recomended:
             times_recomended[item[1]].append(item[0])
 
-    print(times_recomended)
 
     recommendation_lst = []
 
@@ -97,7 +96,6 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
                 for book in times_recomended[num]:
                     if book not in recommendation_lst and len(recommendation_lst) < 5:
                         recommendation_lst.append(book)
-                        print(book)
 
 
     return recommendation_lst
