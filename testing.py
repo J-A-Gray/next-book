@@ -3,6 +3,7 @@ import unittest
 from server import app
 from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst
 from model import *
+from outward import write_rating_data
 
 class NextBookTests(unittest.TestCase):
     """Test NextBook site"""
@@ -159,7 +160,7 @@ class NextBookTestsDatabase(unittest.TestCase):
     #     recommendations = get_recommendations_lst(neighbors_book_dict=neighbors_book_dict, num_neighbors=4)
     #     self.assertIsInstance(recommendations[0], Book)
 
-
+#Write a test to test csv writer from outward.py
 
 
 if __name__ == "__main__":
@@ -167,20 +168,3 @@ if __name__ == "__main__":
     unittest.main()
     init_app()
 
-
-
-
-
-
-
-
-
-
-
-
-
-# user_book_lst = create_user_list(2689)
-# neighbors_lst = get_nearest_neighbors(2689)
-# # neighbors_lst = ['816', '243', '463', '1069', '319', '1189', '1722', '718', '2302', '462']
-# neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
-# print(get_recommendations_lst(neighbors_dict))

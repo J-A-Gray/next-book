@@ -5,6 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 import os
+import requests
 
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
@@ -134,8 +135,12 @@ def show_book_details(book_id):
     else:
         avg_rating = None
 
+    payload = {"isbn":book.isbn}
 
-    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating)
+    query_url = requests.get("https://www.googleapis.com/books/v1/volumes" + "q" + '&ie=utf-8&oe=utf-8', params=payload)
+    print(query_url.url)
+
+    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, query_url=query_url)
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):

@@ -1,10 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h1>{{ book.title }}</h1>
+  <div id="book-title">
+    <h1>{{ book.title }}</h1>
+  </div>
 
-  {% if "avg_rating" != None %}
-    <p>Average rating: {{ avg_rating }} / 5</p>
+  <div id="book-author">
+  {{ book.author }}
+</div>
+
+  <div id="book-isbn">
+  {{ book.isbn }}
+</div>
+
+  <div id="book-genre">Genres: 
+    <span id="genres">Not Available
+    </span>
+  </div>
+
+  <div id="book-img">
+    <span id ="cover-img"><img src=" " alt="Cover photo" id="cover-thumbnail">
+    </span>
+  </div>
+
+
+  <div id="book-summary">Summary: 
+    <span id="summary"> 
+      <div>
+      <p>Not available</p>
+    </div>
+    </span>
+  </div>
+
+  <script>
+
+
+    function retrieveInfo(query_url) {
+      $.get(query_url, displayResults)
+      }
+      // needs to be done programmatically
+
+    function displayResults(results) {
+      $('span#summary').html(results.items[0].volumeInfo.description)
+      $('img#cover-thumbnail').attr('src', results.items[0].volumeInfo.imageLinks.smallThumbnail)
+      $('span#genres').html(results.items[0].volumeInfo.categories)
+    }
+
+    $(retrieveInfo())
+    </script>
+   <!--  <script>
+      let myUrl = "https://www.googleapis.com/books/v1/volumes";
+
+      function addQueryStringParams(name, value) {
+        let re = new RegExp("([?&]" + name + "=)[^&]+", "");
+
+        function add(sep) {
+          myUrl += sep + name + "=" + encodeURIComponent(value);
+        }
+
+        function change() {
+          myUrl = myUrl.replace(re, "$1" + encodeURIComponent(value));
+        }
+        if (myUrl.indexOf("?") === -1) {
+          add("?");
+        } else {
+          if (re.test(myUrl)) {
+            change();
+          } else {
+            add("&");
+          }
+        }
+      }
+
+      console.log(myUrl)
+
+      addQueryStringParams("isbn", "184997053X")
+      console.log(myUrl)
+    </script> -->
+
+
+
+
+  {% if avg_rating != None %}
+      <p>Average rating: {{ avg_rating }} / 5</p>
   {% endif %}
 
   
@@ -41,5 +119,12 @@
   {% endif %}
 
 
-
+{% if book.isbn %}
+  <script>
+  $("#book").data({"isbn":book.isbn});
+  </script>
+{% endif %}
 {% endblock %}
+
+<!-- needs: -->
+<!-- generate the gbooks link programmatically -->
