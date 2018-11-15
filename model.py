@@ -40,6 +40,8 @@ class Book(db.Model):
 
         return f"<Book book_id={self.book_id} title={self.title} author={self.author}>"
 
+
+
 class Rating(db.Model):
     """Rating of NextBook website."""
 
@@ -118,7 +120,7 @@ def example_data():
                         rating5, rating6, rating7, rating8, rating9, rating10])
     db.session.commit()
 
-def connect_to_db(app, db_uri='postgresql:///nextbook'):
+def connect_to_db(app, db_uri='postgresql:///yourbook'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database

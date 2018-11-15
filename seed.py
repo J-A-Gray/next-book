@@ -70,7 +70,7 @@ def load_books():
                             title=title,
                             author=author)
 
-                #add every movie
+                #add every book
                 db.session.add(book)
 
               

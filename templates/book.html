@@ -13,74 +13,31 @@
   {{ book.isbn }}
 </div>
 
-  <div id="book-genre">Genres: 
-    <span id="genres">Not Available
-    </span>
-  </div>
-
-  <div id="book-img">
-    <span id ="cover-img"><img src=" " alt="Cover photo" id="cover-thumbnail">
-    </span>
-  </div>
+  <!-- actually this if needs to happen only if the response is succesful and only returns one result -->
 
 
-  <div id="book-summary">Summary: 
-    <span id="summary"> 
-      <div>
-      <p>Not available</p>
+  {% if book.isbn %}
+    <div id="book-genre">Genres: 
+      <span id="genres">Not Available 
+      </span>
     </div>
-    </span>
-  </div>
 
-  <script>
+    <div id="book-img">
+      <span id ="cover-img"><img src=" " alt="Cover photo" id="cover-thumbnail">
+      </span>
+    </div>
 
-
-    function retrieveInfo(query_url) {
-      $.get(query_url, displayResults)
-      }
-      // needs to be done programmatically
-
-    function displayResults(results) {
-      $('span#summary').html(results.items[0].volumeInfo.description)
-      $('img#cover-thumbnail').attr('src', results.items[0].volumeInfo.imageLinks.smallThumbnail)
-      $('span#genres').html(results.items[0].volumeInfo.categories)
-    }
-
-    $(retrieveInfo())
-    </script>
-   <!--  <script>
-      let myUrl = "https://www.googleapis.com/books/v1/volumes";
-
-      function addQueryStringParams(name, value) {
-        let re = new RegExp("([?&]" + name + "=)[^&]+", "");
-
-        function add(sep) {
-          myUrl += sep + name + "=" + encodeURIComponent(value);
-        }
-
-        function change() {
-          myUrl = myUrl.replace(re, "$1" + encodeURIComponent(value));
-        }
-        if (myUrl.indexOf("?") === -1) {
-          add("?");
-        } else {
-          if (re.test(myUrl)) {
-            change();
-          } else {
-            add("&");
-          }
-        }
-      }
-
-      console.log(myUrl)
-
-      addQueryStringParams("isbn", "184997053X")
-      console.log(myUrl)
-    </script> -->
+    <div id="book-summary">Summary: 
+      <span id="summary"> 
+        <div>
+        <p>Not available</p>
+      </div>
+      </span>
+    </div>
+  {% endif %}
 
 
-
-
+  
   {% if avg_rating != None %}
       <p>Average rating: {{ avg_rating }} / 5</p>
   {% endif %}
@@ -118,13 +75,24 @@
       </ul>
   {% endif %}
 
+<!-- this script is redundant, response already gotten on server side, could instead jsonify the response, create instance methods on Book that could be summary, cover image and genres, then just use dot notation here in template (i.e. {{ book.summary }}) -->
+  <script> 
 
-{% if book.isbn %}
-  <script>
-  $("#book").data({"isbn":book.isbn});
+    const query_url = '{{ response.url }}'; 
+
+    function retrieveInfo() {
+      $.get(query_url, displayResults)
+      }
+
+    function displayResults(data) {
+      console.log(data)
+      $('span#summary').html(data.items[0].volumeInfo.description)
+      $('img#cover-thumbnail').attr('src', data.items[0].volumeInfo.imageLinks.smallThumbnail)
+      $('span#genres').html(data.items[0].volumeInfo.categories)
+    }
+
+    $(retrieveInfo())
+  
   </script>
-{% endif %}
-{% endblock %}
 
-<!-- needs: -->
-<!-- generate the gbooks link programmatically -->
+{% endblock %}
