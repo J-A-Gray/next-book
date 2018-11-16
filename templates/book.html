@@ -17,24 +17,29 @@
 
 
   {% if book.isbn %}
-    <div id="book-genre">Genres: 
-      <span id="genres">Not Available 
-      </span>
+    <div id="book-genre">Genres:
+      <ul id="genres">
+        {% for genre in genres %}
+          <li> {{ genre }} </li>
+        {% endfor %}
+      </ul>
     </div>
 
     <div id="book-img">
-      <span id ="cover-img"><img src=" " alt="Cover photo" id="cover-thumbnail">
+      <span id ="cover-img"><img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
       </span>
     </div>
 
+    <br>
     <div id="book-summary">Summary: 
       <span id="summary"> 
         <div>
-        <p>Not available</p>
+        <p>{{ summary }}</p>
       </div>
       </span>
     </div>
   {% endif %}
+
 
 
   
@@ -75,24 +80,6 @@
       </ul>
   {% endif %}
 
-<!-- this script is redundant, response already gotten on server side, could instead jsonify the response, create instance methods on Book that could be summary, cover image and genres, then just use dot notation here in template (i.e. {{ book.summary }}) -->
-  <script> 
 
-    const query_url = '{{ response.url }}'; 
-
-    function retrieveInfo() {
-      $.get(query_url, displayResults)
-      }
-
-    function displayResults(data) {
-      console.log(data)
-      $('span#summary').html(data.items[0].volumeInfo.description)
-      $('img#cover-thumbnail').attr('src', data.items[0].volumeInfo.imageLinks.smallThumbnail)
-      $('span#genres').html(data.items[0].volumeInfo.categories)
-    }
-
-    $(retrieveInfo())
-  
-  </script>
 
 {% endblock %}

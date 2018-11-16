@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 import os
 import requests
+import urllib3
 
 
 from model import connect_to_db, db, User, Book, Rating
@@ -138,15 +139,17 @@ def show_book_details(book_id):
 
     
     url = "https://www.googleapis.com/books/v1/volumes"
-    payload = {"q": "isbn:{}".format(book.isbn)}
+    payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
 
 
     response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-    print(response.url)
+    # print(response.url)
+    book_json = response.json()
+    summary = book_json["items"][0]["volumeInfo"]["description"]
+    cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
+    genres = book_json["items"][0]["volumeInfo"]["categories"]
 
-
-
-    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, response=response)
+    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, response=response, summary=summary, cover_img=cover_img, genres=genres)
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):

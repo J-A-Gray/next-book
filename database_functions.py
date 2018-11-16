@@ -31,6 +31,12 @@ def get_book_id(isbn):
 
     return book.book_id
 
+def get_books_by_author(author):
+    """Gets a list of book objects by a particular author"""
+
+    books = Book.query.filter(Book.author==author).all()
+
+    return books
 
 def add_rating(user_id, book_id, score=5):
 
