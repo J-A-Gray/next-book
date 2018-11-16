@@ -1,5 +1,7 @@
 from model import *
 
+
+
 def add_anon_user():
     """Adds a user_id for a non-logged in user from the landing page."""
 
@@ -32,9 +34,17 @@ def get_book_id(isbn):
     return book.book_id
 
 def get_books_by_author(author):
-    """Gets a list of book objects by a particular author"""
+    """Get a list of book objects by a particular author"""
 
-    books = Book.query.filter(Book.author==author).all()
+    author = str(author).title()
+    books = Book.query.filter(Book.author.ilike("%" + str(author) + "%")).all()
+
+    return books
+
+def get_book_by_title(title):
+    """Get a book object by title"""
+    title = str(title)
+    books = Book.query.filter(Book.title.ilike("%" + str(title) + "%")).all()
 
     return books
 

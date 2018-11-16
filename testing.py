@@ -1,7 +1,7 @@
 import unittest 
 
 from server import app
-from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst
+from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title
 from model import *
 from outward import write_rating_data
 
@@ -103,23 +103,23 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertLess(rating_id, 11)
 
 
-    def test_get_book_id(self):
-        """Test to get a book_id from an ISBN and display title on book_id page"""
+    # def test_get_book_id(self):
+    #     """Test to get a book_id from an ISBN and display title on book_id page"""
 
-        book_id = get_book_id(isbn='7491433')
-        result = self.client.get('/books/'+ str(book_id))
-        self.assertIn(b"The Shock of the Fall", result.data)
-        self.assertNotIn(b"Brief History of Time", result.data)
+    #     book_id = get_book_id(isbn='7491433')
+    #     result = self.client.get('/books/'+ str(book_id))
+    #     self.assertIn(b"The Shock of the Fall", result.data)
+    #     self.assertNotIn(b"Brief History of Time", result.data)
 
-    def test_add_rating(self):
+    # def test_add_rating(self):
 
-        rating = add_rating(user_id=1, book_id=7695)
+    #     rating = add_rating(user_id=1, book_id=7695)
 
-        self.assertEqual(rating.book_id, 7695)
+    #     self.assertEqual(rating.book_id, 7695)
 
-        result = self.client.get('/books/' + str(rating.book_id))
-        self.assertIn(b"/users/1", result.data)
-        self.assertNotIn(b"/users/15", result.data)
+    #     result = self.client.get('/books/' + str(rating.book_id))
+    #     self.assertIn(b"/users/1", result.data)
+    #     self.assertNotIn(b"/users/15", result.data)
 
 
     def test_create_user_list(self):
@@ -137,7 +137,6 @@ class NextBookTestsDatabase(unittest.TestCase):
 
         neighbors_dict = create_neighbors_book_dict(neighbors_user_id_lst=['1','2'], user_book_lst=user_book_id_lst, score=5)
         for key in neighbors_dict.keys():
-            print(key)
             self.assertIsInstance(key, Book)
 
         
@@ -146,6 +145,25 @@ class NextBookTestsDatabase(unittest.TestCase):
             neighbors_book_lst.append(key.author)
         self.assertIn('Bernard Cornwell', neighbors_book_lst)
         self.assertNotIn('Marilynne Robinson', neighbors_book_lst)
+
+    def test_get_books_by_author(self):
+
+        books = get_books_by_author("Ahern")
+        author_lst = []
+        for book in books:
+            author_lst.append(book.author)
+        self.assertIn("Cecelia Ahern", author_lst)
+
+
+    def test_get_book_by_title(self):
+        """Test if users can search db by title"""
+        books = get_book_by_title("the shock of the")
+        print(books)
+        title_lst = []
+        for book in books:
+            title_lst.append(book.title)
+        print(title_lst)
+        self.assertIn("The Shock of the Fall", title_lst)
 
     
     # def test_get_recommendations_lst(self):

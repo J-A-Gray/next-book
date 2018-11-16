@@ -200,12 +200,16 @@ def process_books():
     # query db to get user id
     anon_id = get_last_user_id()
 
-    # query db to get book_ids
+    # query db to get book_ids if user entered isbn
     book1_id = get_book_id(str(b1))
     book2_id = get_book_id(str(b2))
     book3_id = get_book_id(str(b3))
     book4_id = get_book_id(str(b4))
     book5_id = get_book_id(str(b5))
+
+    #query db to get title of books by author
+    
+
 
     #add ratings to db
     add_rating(anon_id, book1_id)
