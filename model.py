@@ -1,6 +1,7 @@
 """Models and database functions for NextBook project."""
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.inspection import inspect
 
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -11,8 +12,17 @@ db = SQLAlchemy()
 
 ##############################################################################
 # Model definitions
+class Serializer(object):
 
-class User(db.Model):
+    def serialize(self):
+        
+        return {c: getattr(self, c) for c in inspect(self).attrs.keys()}
+
+    @staticmethod
+    def serialize_list(lst):
+        return [m.serialize() for m in lst]
+
+class User(db.Model, Serializer):
     """User of NextBook website."""
 
     __tablename__ = "users"
@@ -24,7 +34,12 @@ class User(db.Model):
     def __repr__(self):
         return f"<User user_id={self.user_id} email={self.email}>"
 
-class Book(db.Model):
+    def serialize(self):
+        user_object_serialized = Serializer.serialize(self)
+        del user_object_serialized['password']
+        return user_object_serialized
+
+class Book(db.Model, Serializer):
     """Books of NextBook website."""
     
     __tablename__ = "books"
@@ -39,7 +54,6 @@ class Book(db.Model):
     def __repr__(self):
 
         return f"<Book book_id={self.book_id} title={self.title} author={self.author}>"
-
 
 
 class Rating(db.Model):
@@ -62,6 +76,7 @@ class Rating(db.Model):
 
         return f"<Rating rating_id={self.rating_id} book_id={self.book_id} user_id={self.user_id} score={self.score}>"
 
+
 ##############################################################################
 # Helper functions
 def init_app():
@@ -70,8 +85,6 @@ def init_app():
 
     connect_to_db(app)
     print("Connected to DB.")
-
-
 
 
 def example_data():

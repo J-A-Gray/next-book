@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request, flash, redirect, session
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import os
 import requests
@@ -14,7 +14,7 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title
 
 
 app = Flask(__name__)
@@ -207,8 +207,8 @@ def process_books():
     book4_id = get_book_id(str(b4))
     book5_id = get_book_id(str(b5))
 
-    #query db to get title of books by author
-    
+
+
 
 
     #add ratings to db
@@ -242,6 +242,46 @@ def display_favorite_books():
 
     return render_template('loved_books_result.html', recommendation_lst=recommendation_lst)
 
+@app.route('/search')
+def search_books():
+    """Searches for books to add to ratings list"""
+
+
+
+    # if request.args:
+    #     author = request.args.get('author')
+    #     title = request.args.get('title')
+
+    #     # if title:
+    #     #     book1 = get_book_by_title(title)
+    #     #     print(book1)
+
+
+    return render_template('search.html')
+
+@app.route('/search-by-title.json')
+def search_books_db():
+
+    title = request.args.get("title")
+ 
+
+    if title:
+        books_by_title = get_book_by_title(title)
+        books_by_title_serialized = Book.serialize_list(books_by_title)
+        for book in books_by_title_serialized:
+           del book['ratings']
+
+        return jsonify(books_by_title_serialized)
+
+        # return jsonify({"books": books_by_title})
+
+        
+        # book_as_lst = []
+        # for book in books_by_title:
+        #     books_as_lst.append(book.title)
+
+    else:
+        return "No books found."
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

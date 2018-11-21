@@ -147,8 +147,8 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertNotIn('Marilynne Robinson', neighbors_book_lst)
 
     def test_get_books_by_author(self):
-
-        books = get_books_by_author("Ahern")
+        """Test if (case-insensitive) db search by author function works"""
+        books = get_books_by_author("ahern")
         author_lst = []
         for book in books:
             author_lst.append(book.author)
@@ -156,14 +156,21 @@ class NextBookTestsDatabase(unittest.TestCase):
 
 
     def test_get_book_by_title(self):
-        """Test if users can search db by title"""
-        books = get_book_by_title("the shock of the")
-        print(books)
+        """Test if (case-insensitive) db search by title function works"""
+        books = get_book_by_title("(the saxon stories, #6)")
         title_lst = []
         for book in books:
             title_lst.append(book.title)
-        print(title_lst)
-        self.assertIn("The Shock of the Fall", title_lst)
+        self.assertIn("Death of Kings (The Saxon Stories, #6)", title_lst)
+
+        books2 = get_book_by_title("shock of the")
+        title_lst2 = []
+        for book in books2:
+            title_lst2.append(book.title)
+        self.assertIn("The Shock of the Fall", title_lst2)
+
+
+        
 
     
     # def test_get_recommendations_lst(self):

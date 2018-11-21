@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}
+NextBook - Search
+{% endblock %}
+
+{% block content %}
+
+<form id="search-by-title-form" method="get" 
+action="/search-by-title.json">
+    <div class="form-group">
+        <label for="title-field">Title</label>
+        <input type="text" 
+               class="form-control" 
+               name="title" 
+               id="title-field" 
+               placeholder="All Quiet on the Western Front">
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary">
+    </div>
+</form>
+
+<script src="/static/book-by-title.js"></script>
+
+<div>
+    <form id="results-from-title-search" method="get" action=?>
+        <div class="form-group">
+            <p>Titles</p>
+
+            <div id="book-title"><br>
+            <div id="book-author"><br>
+
+
+{% endblock %}

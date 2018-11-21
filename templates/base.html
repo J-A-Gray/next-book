@@ -9,10 +9,10 @@
 <body>
     NextBook
     {% if 'user_id' in session %}
-        <a href='/logout' style='background-color: powderblue'>Log out</a>
+        <a href='/logout' class="btn btn-primary" style='background-color: teal'>Log out</a>
     
     {% else %}
-        <a href='/login' style='background-color: powderblue'>Log in</a>
+        <a href='/login' class="btn btn-primary" style='background-color: teal'>Log in</a>
     {% endif %}
         
     <hr>
