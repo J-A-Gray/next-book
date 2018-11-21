@@ -272,11 +272,9 @@ def search_books_by_title():
 def search_books_by_author():
 
     author = request.args.get("author")
-    print(author)
 
     if author:
         books_by_author = get_books_by_author(author)
-        print(books_by_author)
         books_by_author_serialized = Book.serialize_list(books_by_author)
         for book in books_by_author_serialized:
            del book['ratings']
@@ -291,6 +289,7 @@ def search_books_by_author():
 @app.route('/books-added')
 def gather_books():
     pass
+    
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

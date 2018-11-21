@@ -4,6 +4,7 @@ NextBook - Search
 {% endblock %}
 
 {% block content %}
+<div>Search by title!</div>
 <div>
 <form id="search-by-title-form" method="get" 
 action="/search-by-title.json">
@@ -20,7 +21,10 @@ action="/search-by-title.json">
     </div>
 </form>
 </div>
-
+<br>
+<br>
+<div>Search by author!</div>
+<div>
 <div>
 <form id="search-by-author-form" method="get" 
 action="/search-by-author.json">
@@ -42,14 +46,26 @@ action="/search-by-author.json">
 <script src="/static/book-by-author.js"></script>
 </div>
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 <div id="results-from-search">
     <form id="results-from-search" method="get" action="/books-added">
         <div class="form-group">
             <ul id="bklist"></ul>
+        <input type="submit" class="btn btn-primary">
         </div>
     </form>
+    <script src="/static/chosen-books.js"></script>
 </div>
 
 
+    <div class="sidebar">
+        Selected books will go here, maybe?
+        <ul id="chosenbklist"></ul>
+    </div>
 {% endblock %}
