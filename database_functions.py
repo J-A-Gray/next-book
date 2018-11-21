@@ -43,7 +43,7 @@ def get_books_by_author(author):
 
 def get_book_by_title(title):
     """Get a book object by title"""
-    title = str(title)
+   
     books = Book.query.filter(Book.title.ilike("%" + str(title) + "%")).all()
 
     return books

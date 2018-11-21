@@ -4,7 +4,7 @@ NextBook - Search
 {% endblock %}
 
 {% block content %}
-
+<div>
 <form id="search-by-title-form" method="get" 
 action="/search-by-title.json">
     <div class="form-group">
@@ -19,20 +19,37 @@ action="/search-by-title.json">
         <input type="submit" class="btn btn-primary">
     </div>
 </form>
-
-<script src="/static/book-by-title.js"></script>
+</div>
 
 <div>
-    <form id="results-from-title-search" method="get" action=?>
+<form id="search-by-author-form" method="get" 
+action="/search-by-author.json">
+    <div class="form-group">
+        <label for="author-field">Author</label>
+        <input type="text" 
+               class="form-control" 
+               name="author" 
+               id="author-field" 
+               placeholder="Octavia Butler">
+    </div>
+    <div class="form-group">
+        <input type="submit" class="btn btn-primary">
+    </div>
+</form>
+
+
+<script src="/static/book-by-title.js"></script>
+<script src="/static/book-by-author.js"></script>
+</div>
+
+
+<div id="results-from-search">
+    <form id="results-from-search" method="get" action="/books-added">
         <div class="form-group">
-            <p>Titles</p>
-
             <ul id="bklist"></ul>
-
-            <!-- <div id="book-title"><br></div>
-            <div id="book-author"><br></div> -->
         </div>
     </form>
+</div>
 
 
 {% endblock %}

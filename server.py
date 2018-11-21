@@ -14,7 +14,7 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author
 
 
 app = Flask(__name__)
@@ -247,20 +247,10 @@ def search_books():
     """Searches for books to add to ratings list"""
 
 
-
-    # if request.args:
-    #     author = request.args.get('author')
-    #     title = request.args.get('title')
-
-    #     # if title:
-    #     #     book1 = get_book_by_title(title)
-    #     #     print(book1)
-
-
     return render_template('search.html')
 
 @app.route('/search-by-title.json')
-def search_books_db():
+def search_books_by_title():
 
     title = request.args.get("title")
  
@@ -275,13 +265,32 @@ def search_books_db():
 
         # return jsonify({"books": books_by_title})
 
-        
-        # book_as_lst = []
-        # for book in books_by_title:
-        #     books_as_lst.append(book.title)
+    else:
+        return "No books found."
+
+@app.route('/search-by-author.json')
+def search_books_by_author():
+
+    author = request.args.get("author")
+    print(author)
+
+    if author:
+        books_by_author = get_books_by_author(author)
+        print(books_by_author)
+        books_by_author_serialized = Book.serialize_list(books_by_author)
+        for book in books_by_author_serialized:
+           del book['ratings']
+
+        return jsonify(books_by_author_serialized)
+
+        # return jsonify({"books": books_by_title})
 
     else:
         return "No books found."
+
+@app.route('/books-added')
+def gather_books():
+    pass
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
