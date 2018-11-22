@@ -48,6 +48,13 @@ def get_book_by_title(title):
 
     return books
 
+def get_book_by_book_id(book_id):
+    """Get a book object by book_id"""
+
+    book = Book.query.filter(Book.book_id==str(book_id)).first()
+
+    return book
+
 def add_rating(user_id, book_id, score=5):
 
     next_rating_id = get_last_rating_id() + 1

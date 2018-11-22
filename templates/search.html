@@ -25,7 +25,6 @@ action="/search-by-title.json">
 <br>
 <div>Search by author!</div>
 <div>
-<div>
 <form id="search-by-author-form" method="get" 
 action="/search-by-author.json">
     <div class="form-group">
@@ -49,9 +48,6 @@ action="/search-by-author.json">
 <br>
 <br>
 <br>
-<br>
-<br>
-<br>
 
 <div id="results-from-search">
     <form id="results-from-search" method="get" action="/books-added">
@@ -64,8 +60,12 @@ action="/search-by-author.json">
 </div>
 
 
-    <div class="sidebar">
-        Selected books will go here, maybe?
+<div class="sidebar" id="books-for-recommendations">
+    <form id="books-for-recommendations" method="get" action="/books-added">
+        <div class="form-group">
         <ul id="chosenbklist"></ul>
-    </div>
+        <input type="submit" class="btn btn-primary">
+        </div>
+    </form>
+</div>
 {% endblock %}

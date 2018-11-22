@@ -1,7 +1,7 @@
 import unittest 
 
 from server import app
-from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title
+from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id
 from model import *
 from outward import write_rating_data
 
@@ -169,8 +169,10 @@ class NextBookTestsDatabase(unittest.TestCase):
             title_lst2.append(book.title)
         self.assertIn("The Shock of the Fall", title_lst2)
 
-
-        
+    def test_get_book_by_book_id(self):
+        """Test if db search by book_id function works"""
+        book = get_book_by_book_id(3327)
+        self.assertIn("Shock", book.title)
 
     
     # def test_get_recommendations_lst(self):

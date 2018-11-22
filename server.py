@@ -14,7 +14,7 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id
 
 
 app = Flask(__name__)
@@ -286,9 +286,30 @@ def search_books_by_author():
     else:
         return "No books found."
 
+@app.route('/search-by-book-id.json')
+def search_books_by_book_id():
+
+    book_id = int(request.args.get("book_id"))
+    print(book_id)
+
+    if book_id:
+        book_by_book_id = get_book_by_book_id(book_id)
+        book_by_book_id_serialized = Book.serialize(book_by_book_id)
+        del book_by_book_id_serialized['ratings']
+
+
+        return jsonify(book_by_book_id_serialized)
+
+        # return jsonify({"books": books_by_title})
+
+    else:
+        return "No books found."
+
 @app.route('/books-added')
 def gather_books():
-    pass
+   
+
+   return "books in list?"
     
 
 if __name__ == "__main__":
