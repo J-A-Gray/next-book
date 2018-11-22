@@ -305,12 +305,54 @@ def search_books_by_book_id():
     else:
         return "No books found."
 
-@app.route('/books-added')
+@app.route('/books-added', methods=['POST'])
 def gather_books():
    
+   #get MultiDict from client
+   books = request.form
+   book_id_lst=[]
 
-   return "books in list?"
+   for key, value in books.items():
+    book_id_lst.append(value)
+
+   # create a user to hold ratings
+   anon_user = add_anon_user()
+   print(anon_user)
+
+   # query db to get user id
+   anon_id = get_last_user_id()
+   print(anon_id)
+
+   #add ratings to db
+   for id in book_id_lst:
+    #need a conditional here to check book_id is in db
+    rating = add_rating(anon_id, str(id))
+    print(rating)
+
+   #write csv file to send to Surprise library
+   write_rating_data()
+
+   #set user_id in session
+   session['user_id'] = anon_id
+
+
+
+   return redirect('/recommendations')
+
+@app.route('/recommendations', methods=['GET'])
+def display_recommended_books():
+
+    user_id = session.get('user_id')
+    neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
     
+    #from database_functions.py
+    user_book_lst = create_user_list(int(user_id))
+    neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
+    recommendation_lst = get_recommendations_lst(neighbors_dict)
+    print(recommendation_lst)
+
+
+    return render_template('recommendations.html', recommendation_lst=recommendation_lst)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

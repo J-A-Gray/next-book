@@ -61,11 +61,12 @@ action="/search-by-author.json">
 
 
 <div class="sidebar" id="books-for-recommendations">
-    <form id="books-for-recommendations" method="get" action="/books-added">
+    <form id="books-for-recommendations" method="post" action="/books-added">
         <div class="form-group">
         <ul id="chosenbklist"></ul>
         <input type="submit" class="btn btn-primary">
         </div>
     </form>
+
 </div>
 {% endblock %}

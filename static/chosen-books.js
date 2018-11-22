@@ -1,3 +1,5 @@
+"use strict";
+
 function initCollectBooksFormHandler() {
     $('#results-from-search').on('submit', evt => {
         evt.preventDefault();

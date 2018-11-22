@@ -1,3 +1,5 @@
+"use strict";
+
 function initSearchByAuthorFormHandler() {
     $('#search-by-author-form').on('submit', evt => {
         evt.preventDefault();
