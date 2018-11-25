@@ -4,8 +4,43 @@
 <ul>
     {% for rec in recommendation_lst %}
         <li>
-            {{ rec.title }} by {{ rec.author }}
+            <div id="book-title">
+            <h1>{{ rec.title }}</h1>
+            </div>
+
+            <div id="book-author">
+            {{ rec.author }}
+            </div>
+
+            <div id="book-isbn">
+            {{ rec.isbn }}
+            </div>
+
+            {% if rec.isbn %}
+                <div id="book-genre">Genres:
+                    <ul id="genres">
+                    {% for genre in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["categories"] %}
+                        <li> {{ genre }} </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+
+                <div id="book-img">
+                    <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
+                    </span>
+                </div>
+
+                <br>
+                <div id="book-summary">Summary: 
+                    <span id="summary"> 
+                        <div>
+                            <p>{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["description"] }}</p>
+                        </div>
+                    </span>
+                </div>
+            {% endif %}
         </li>
+
     {% endfor %}
 </ul>
 

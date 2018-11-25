@@ -137,7 +137,7 @@ def show_book_details(book_id):
     else:
         avg_rating = None
 
-    
+    #get summary, genres and cover image from Google Books
     url = "https://www.googleapis.com/books/v1/volumes"
     payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
 
@@ -351,8 +351,22 @@ def display_recommended_books():
     recommendation_lst = get_recommendations_lst(neighbors_dict)
     print(recommendation_lst)
 
+    recommendation_info_dict = {}
 
-    return render_template('recommendations.html', recommendation_lst=recommendation_lst)
+    #get summary, genres and cover image from Google Books
+    for book in recommendation_lst:
+        # recommendation_info_dict[book.book_id] = {}
+        url = "https://www.googleapis.com/books/v1/volumes"
+        payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
+        
+
+        response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
+        # print(response.url)
+
+        book_json = response.json()
+        recommendation_info_dict[book.book_id] = book_json
+
+    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
