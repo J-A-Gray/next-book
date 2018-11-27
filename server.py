@@ -200,16 +200,17 @@ def show_authors():
 def show_author_details(author):
 
     book_lst = Book.query.filter_by(author=author).all()
-    print(book_lst)
+    
   
 
-    # #get summary, genres and cover image from Google Books
-    # url = "https://www.googleapis.com/books/v1/volumes"
-    # payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
+    #get author bio from somewhere?
+    
+
+        # print(response.text)
+        # info = response.json()
+        # print(info.items().first)
 
 
-    # response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-    # # print(response.url)
     # book_json = response.json()
     # if book_json["totalItems"] == 1:
     #     summary = book_json["items"][0]["volumeInfo"]["description"]
@@ -337,6 +338,7 @@ def display_recommended_books():
     print(recommendation_lst)
 
     recommendation_info_dict = {}
+    recommendation_link_dict = {}
 
     #get summary, genres and cover image from Google Books
     for book in recommendation_lst:
@@ -351,8 +353,20 @@ def display_recommended_books():
         recommendation_info_dict[book.book_id] = book_json
         # print(recommendation_info_dict)
 
+        if book_json["totalItems"] == 1:
+            isbn13 = (book_json["items"][0]["volumeInfo"]['industryIdentifiers'][0]['identifier'])
+        
+            library_link_url = "https://labs.library.link/services/borrow/"
+            payload = {"isbn": "{}".format(isbn13)}
 
-    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict)
+            response = requests.get(library_link_url, params=payload)
+            # print(response.url)
+            recommendation_link_dict[book.book_id] = response.url
+            print(recommendation_link_dict)
+
+
+
+    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
