@@ -133,7 +133,7 @@ def example_data():
                         rating5, rating6, rating7, rating8, rating9, rating10])
     db.session.commit()
 
-def connect_to_db(app, db_uri='postgresql:///yourbook'):
+def connect_to_db(app, db_uri='postgresql:///nextbook'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database

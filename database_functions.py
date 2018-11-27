@@ -64,6 +64,22 @@ def add_rating(user_id, book_id, score=5):
 
     return rating
 
+def create_authors_dict():
+    """Create a dictionary of all authors in db as keys and all books written by 
+    author as values"""
+
+    books = Book.query.order_by('author').all()
+    author_dict = {}
+    for book in books:
+        if author_dict.get(book.author):
+            author_dict[book.author].append(book)
+        else:
+            author_dict[book.author] = []
+            author_dict[book.author].append(book)
+
+    return author_dict
+
+
 def create_user_list(user_id):
     """Create a list of books rated by the user"""
     user_book_lst=[]

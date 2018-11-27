@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <h2>I think you might like:</h2>
 <ul>
     {% for rec in recommendation_lst %}
         <li>
             <div id="book-title">
-            <h1>{{ rec.title }}</h1>
+            <h1><a href="/books/{{ rec.book_id }}">{{ rec.title }}</a></h1>
             </div>
 
             <div id="book-author">
@@ -17,30 +18,31 @@
             </div>
 
             {% if rec.isbn %}
-                <div id="book-genre">Genres:
-                    <ul id="genres">
-                    {% for genre in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["categories"] %}
-                        <li> {{ genre }} </li>
-                    {% endfor %}
-                    </ul>
-                </div>
+                {% if recommendation_info_dict[rec.book_id]["totalItems"] == 1 %}
+                    <div id="book-genre">Genres:
+                        <ul id="genres">
+                        {% for genre in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["categories"] %}
+                            <li> {{ genre }} </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
 
-                <div id="book-img">
-                    <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
-                    </span>
-                </div>
+                    <div id="book-img">
+                        <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
+                        </span>
+                    </div>
 
-                <br>
-                <div id="book-summary">Summary: 
-                    <span id="summary"> 
-                        <div>
-                            <p>{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["description"] }}</p>
-                        </div>
-                    </span>
-                </div>
+                    <br>
+                    <div id="book-summary">Summary: 
+                        <span id="summary"> 
+                            <div>
+                                <p>{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["description"] }}</p>
+                            </div>
+                        </span>
+                    </div>
+                {% endif %}                
             {% endif %}
         </li>
-
     {% endfor %}
 </ul>
 

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>Authors</h1>
+  <ul>
+    <div id="books-by-author">
+      {% for author, book_lst in author_dict.items() %}
+        <h2><a href="/authors/{{ author }}"> {{ author }}</a></h2>
+            {% for book in book_lst %}
+                <li>
+                    <a href="/books/{{ book.book_id }}">{{ book.title }} </a>
+                </li>
+            {% endfor %}
+        {% endfor %}
+        </div>
+
+  </ul>
+{% endblock %}

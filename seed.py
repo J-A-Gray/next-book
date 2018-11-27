@@ -115,6 +115,36 @@ def load_ratings():
             if book_in_db and user_in_db:
                 db.session.add(rating)
                 print("Rating for " + str(rating.book_id) + " added to database")
+
+    with open('seed_data/splitfile_2.csv', encoding='utf-16') as csvfile:
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        except:
+            dialect = 'excel'
+
+        csvfile.seek(0)
+        reader = csv.reader(csvfile, dialect)
+        next(csvfile) #skips first row of the csv file
+        for row in reader:
+            book_id = row[1]
+            user_id = row[0]
+            score = row[2]
+                
+            user_id = int(user_id)
+            book_id = int(book_id)
+            score = int(score)
+
+            rating = Rating(user_id=user_id,
+                            book_id=book_id,
+                            score=score)
+
+            #We need to add to the session or it won't ever be stored
+
+            book_in_db = Book.query.get(book_id)
+            user_in_db = User.query.get(user_id)
+            if book_in_db and user_in_db:
+                db.session.add(rating)
+                print("Rating for " + str(rating.book_id) + " added to database")
             
         db.session.commit()
 

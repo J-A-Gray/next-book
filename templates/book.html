@@ -6,7 +6,7 @@
   </div>
 
   <div id="book-author">
-  {{ book.author }}
+  <a href="/authors/{{ book.author }}">{{ book.author }}</a>
 </div>
 
   <div id="book-isbn">
@@ -16,7 +16,7 @@
   <!-- actually this if needs to happen only if the response is succesful and only returns one result -->
 
 
-  {% if book.isbn %}
+  {% if genres %}
     <div id="book-genre">Genres:
       <ul id="genres">
         {% for genre in genres %}
@@ -24,12 +24,16 @@
         {% endfor %}
       </ul>
     </div>
+  {% endif %}
 
+  {% if cover_img %}
     <div id="book-img">
       <span id ="cover-img"><img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
       </span>
     </div>
+  {% endif %}
 
+  {% if summary %}
     <br>
     <div id="book-summary">Summary: 
       <span id="summary"> 
@@ -49,10 +53,11 @@
 
   
   {% if "user_id" in session %}
-      <h2>Your Rating</h2>
+      
 
     {% if user_rating and user_rating != None %}
-        <p>You rated {{ book.title }} a {{ user_rating.score }}/5</p>
+      <h2>Your Rating</h2>
+      <p>You rated {{ book.title }} a {{ user_rating.score }}/5</p>
 
     {% endif %}
       <h2>Rate {{ book.title }}!</h2>

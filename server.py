@@ -14,7 +14,7 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict
 
 
 app = Flask(__name__)
@@ -52,7 +52,8 @@ def register_for_site():
         flash("You already have an account. Please log in.")
 
     else:
-        new_user = User(email=email, password=password)
+        next_id = get_last_user_id() + 1
+        new_user = User(user_id=next_id, email=email, password=password)
 
         db.session.add(new_user)
     db.session.commit()
@@ -95,12 +96,6 @@ def logout():
     flash("Bye! Happy Reading!")
     return redirect('/')
 
-@app.route('/users')
-def user_list():
-    """Show list of users"""
-
-    users = User.query.all()
-    return render_template('user_list.html', users=users)
 
 @app.route('/users/<int:user_id>')
 def user_detail(user_id):
@@ -133,7 +128,8 @@ def show_book_details(book_id):
 
     rating_scores = [r.score for r in book.ratings]
     if len(rating_scores) > 0:
-        avg_rating = float(sum(rating_scores))/len(rating_scores) #need to format
+        avg_rating = float(sum(rating_scores))/len(rating_scores)
+        avg_rating = f"{avg_rating:.1f}" 
     else:
         avg_rating = None
 
@@ -145,9 +141,15 @@ def show_book_details(book_id):
     response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
     # print(response.url)
     book_json = response.json()
-    summary = book_json["items"][0]["volumeInfo"]["description"]
-    cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
-    genres = book_json["items"][0]["volumeInfo"]["categories"]
+    if book_json["totalItems"] == 1:
+        summary = book_json["items"][0]["volumeInfo"]["description"]
+        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
+        genres = book_json["items"][0]["volumeInfo"]["categories"]
+
+    else:
+        summary = None
+        cover_img = None
+        genres = None
 
     return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, response=response, summary=summary, cover_img=cover_img, genres=genres)
 
@@ -167,80 +169,59 @@ def set_rating(book_id):
         user_rating.score = score #then update the score
         flash("You've updated your rating!")
         db.session.add(user_rating)
+        print(user_rating)
         db.session.commit()
 
     
     else:# if the rating object does not exist yet
-        user_rating = Rating(user_id=user_id, book_id=book_id, score=score)
+        next_id = get_last_rating_id() + 1
+        user_rating = Rating(rating_id=next_id, user_id=user_id, book_id=book_id, score=score)
         flash("Thank you for rating!")
 
         db.session.add(user_rating)
+        print(user_rating)
 
         db.session.commit()
 
     return redirect(f'/books/{book_id}')
 
-@app.route('/lovedbooks', methods=['GET'])
-def book_form():
 
-    return render_template('reference_books.html')
+@app.route('/authors')
+def show_authors():
+    """Show an authors list."""
 
-@app.route('/lovedbooks', methods=['POST'])
-def process_books():
-
-    b1 = request.form['book1']
-    b2 = request.form['book2']
-    b3 = request.form['book3']
-    b4 = request.form['book4']
-    b5 = request.form['book5']
-
-    # create a user to hold ratings
-    anon_user = add_anon_user()
-
-    # query db to get user id
-    anon_id = get_last_user_id()
-
-    # query db to get book_ids if user entered isbn
-    book1_id = get_book_id(str(b1))
-    book2_id = get_book_id(str(b2))
-    book3_id = get_book_id(str(b3))
-    book4_id = get_book_id(str(b4))
-    book5_id = get_book_id(str(b5))
+    author_dict = create_authors_dict()
 
 
+    return render_template('author_list.html', author_dict=author_dict)
 
 
+@app.route('/authors/<author>', methods=['GET'])
+def show_author_details(author):
 
-    #add ratings to db
-    add_rating(anon_id, book1_id)
-    add_rating(anon_id, book2_id)
-    add_rating(anon_id, book3_id)
-    add_rating(anon_id, book4_id)
-    add_rating(anon_id, book5_id)
+    book_lst = Book.query.filter_by(author=author).all()
+    print(book_lst)
+  
 
-    #write csv file to send to Surprise library
-    write_rating_data()
-
-    #set user_id in session
-    session['user_id'] = anon_id
+    # #get summary, genres and cover image from Google Books
+    # url = "https://www.googleapis.com/books/v1/volumes"
+    # payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
 
 
-    return redirect('/lovedbooksresults')
+    # response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
+    # # print(response.url)
+    # book_json = response.json()
+    # if book_json["totalItems"] == 1:
+    #     summary = book_json["items"][0]["volumeInfo"]["description"]
+    #     cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
+    #     genres = book_json["items"][0]["volumeInfo"]["categories"]
 
-@app.route('/lovedbooksresults', methods=['GET'])
-def display_favorite_books():
+    # else:
+    #     summary = None
+    #     cover_img = None
+    #     genres = None
 
-    user_id = session.get('user_id')
-    neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
-    
-    #from database_functions.py
-    user_book_lst = create_user_list(int(user_id))
-    neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
-    recommendation_lst = get_recommendations_lst(neighbors_dict)
-    print(recommendation_lst)
-
-
-    return render_template('loved_books_result.html', recommendation_lst=recommendation_lst)
+    return render_template('author.html', author=author, book_lst=book_lst)
 
 @app.route('/search')
 def search_books():
@@ -315,25 +296,29 @@ def gather_books():
    for key, value in books.items():
     book_id_lst.append(value)
 
-   # create a user to hold ratings
-   anon_user = add_anon_user()
-   print(anon_user)
 
-   # query db to get user id
-   anon_id = get_last_user_id()
-   print(anon_id)
+   user_id = session.get('user_id')
+
+   if user_id == None:
+   # create a user to hold ratings
+       anon_user = add_anon_user()
+       print(anon_user)
+
+       # query db to get user id
+       user_id = get_last_user_id()
+       print(user_id)
 
    #add ratings to db
    for id in book_id_lst:
     #need a conditional here to check book_id is in db
-    rating = add_rating(anon_id, str(id))
+    rating = add_rating(user_id, str(id))
     print(rating)
 
    #write csv file to send to Surprise library
    write_rating_data()
 
    #set user_id in session
-   session['user_id'] = anon_id
+   session['user_id'] = user_id
 
 
 
@@ -355,7 +340,6 @@ def display_recommended_books():
 
     #get summary, genres and cover image from Google Books
     for book in recommendation_lst:
-        # recommendation_info_dict[book.book_id] = {}
         url = "https://www.googleapis.com/books/v1/volumes"
         payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
         
@@ -365,6 +349,8 @@ def display_recommended_books():
 
         book_json = response.json()
         recommendation_info_dict[book.book_id] = book_json
+        # print(recommendation_info_dict)
+
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict)
 

@@ -1,7 +1,7 @@
 import unittest 
 
 from server import app
-from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id
+from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id, create_authors_dict
 from model import *
 from outward import write_rating_data
 
@@ -17,9 +17,9 @@ class NextBookTests(unittest.TestCase):
         result = self.client.get("/")
         self.assertIn(b"Nextbook", result.data)
 
-    def test_lovedbooks(self):
-        result = self.client.get('/lovedbooks')
-        self.assertIn(b"Find Your Next Book", result.data)
+    # def test_lovedbooks(self):
+    #     result = self.client.get('/lovedbooks')
+    #     self.assertIn(b"Find Your Next Book", result.data)
 
     # def test_lovedbooksresults(self):
     #     result = self.client.get('/lovedbooksresults', data={'book1': '142407577',
@@ -173,6 +173,15 @@ class NextBookTestsDatabase(unittest.TestCase):
         """Test if db search by book_id function works"""
         book = get_book_by_book_id(3327)
         self.assertIn("Shock", book.title)
+
+    def test_create_authors_dict(self):
+        """Test if dictionary is created with authors as keys and the books 
+        they've written as values"""
+
+        author_dict=create_authors_dict()
+        self.assertIn("Cecelia Ahern", author_dict.keys())
+        self.assertIn('Death of Kings', author_dict['Bernard Cornwell'][0].title)
+
 
     
     # def test_get_recommendations_lst(self):
