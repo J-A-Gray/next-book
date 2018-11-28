@@ -224,12 +224,51 @@ def show_author_details(author):
 
     return render_template('author.html', author=author, book_lst=book_lst)
 
-@app.route('/search')
+@app.route('/search', methods=['GET'])
 def search_books():
     """Searches for books to add to ratings list"""
 
 
     return render_template('search.html')
+
+
+@app.route('/search', methods=['POST'])
+def gather_books():
+   
+   #get MultiDict from client
+   books = request.form
+   book_id_lst=[]
+
+   for key, value in books.items():
+    book_id_lst.append(value)
+
+
+   user_id = session.get('user_id')
+
+   if user_id == None:
+   # create a user to hold ratings
+       anon_user = add_anon_user()
+       print(anon_user)
+
+       # query db to get user id
+       user_id = get_last_user_id()
+       print(user_id)
+
+   #add ratings to db
+   for id in book_id_lst:
+    #need a conditional here to check book_id is in db
+    rating = add_rating(user_id, str(id))
+    print(rating)
+
+   #write csv file to send to Surprise library
+   write_rating_data()
+
+   #set user_id in session
+   session['user_id'] = user_id
+
+
+
+   return redirect('/recommendations')
 
 @app.route('/search-by-title.json')
 def search_books_by_title():
@@ -287,43 +326,7 @@ def search_books_by_book_id():
     else:
         return "No books found."
 
-@app.route('/books-added', methods=['POST'])
-def gather_books():
-   
-   #get MultiDict from client
-   books = request.form
-   book_id_lst=[]
 
-   for key, value in books.items():
-    book_id_lst.append(value)
-
-
-   user_id = session.get('user_id')
-
-   if user_id == None:
-   # create a user to hold ratings
-       anon_user = add_anon_user()
-       print(anon_user)
-
-       # query db to get user id
-       user_id = get_last_user_id()
-       print(user_id)
-
-   #add ratings to db
-   for id in book_id_lst:
-    #need a conditional here to check book_id is in db
-    rating = add_rating(user_id, str(id))
-    print(rating)
-
-   #write csv file to send to Surprise library
-   write_rating_data()
-
-   #set user_id in session
-   session['user_id'] = user_id
-
-
-
-   return redirect('/recommendations')
 
 @app.route('/recommendations', methods=['GET'])
 def display_recommended_books():
@@ -362,7 +365,7 @@ def display_recommended_books():
             response = requests.get(library_link_url, params=payload)
             # print(response.url)
             recommendation_link_dict[book.book_id] = response.url
-            print(recommendation_link_dict)
+
 
 
 
