@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import os
 import requests
 import urllib3
+from pyisbn import convert as convert_isbn
 
 
 from model import connect_to_db, db, User, Book, Rating
@@ -336,18 +337,21 @@ def display_recommended_books():
 
         book_json = response.json()
         print(book_json)
-        recommendation_info_dict[book.book_id] = book_json
-        # print(recommendation_info_dict)
 
-        if book_json["totalItems"] >= 1:
-            isbn13 = (book_json["items"][0]["volumeInfo"]['industryIdentifiers'][0]['identifier'])
+        if book_json["totalItems"] > 0: 
+            recommendation_info_dict[book.book_id] = book_json
+            print(recommendation_info_dict)
+
         
-            library_link_url = "https://labs.library.link/services/borrow/"
-            payload = {"isbn": "{}".format(isbn13)}
+        isbn13 = convert_isbn(book.isbn)
+        print(isbn13)
+    
+        library_link_url = "https://labs.library.link/services/borrow/"
+        payload = {"isbn": "{}".format(isbn13)}
 
-            response = requests.get(library_link_url, params=payload)
-            # print(response.url)
-            recommendation_link_dict[book.book_id] = response.url
+        response = requests.get(library_link_url, params=payload)
+        # print(response.url)
+        recommendation_link_dict[book.book_id] = response.url
 
 
 
