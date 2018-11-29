@@ -10,7 +10,7 @@
             </div>
 
             <div id="book-author">
-            {{ rec.author }}
+            <a href="/authors/{{ rec.author }}">{{ rec.author }}</a>
             </div>
 
             <div id="book-isbn">
@@ -18,7 +18,7 @@
             </div>
 
             {% if rec.isbn %}
-                {% if recommendation_info_dict[rec.book_id]["totalItems"] == 1 %}
+                {% if recommendation_info_dict[rec.book_id]["totalItems"] >= 1 %}
                     <div id="book-genre">Genres:
                         <ul id="genres">
                         {% for genre in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["categories"] %}

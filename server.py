@@ -58,7 +58,7 @@ def register_for_site():
         db.session.add(new_user)
     db.session.commit()
 
-    return redirect('/')
+    return redirect('/login')
 
 @app.route('/login', methods=['GET'])
 def login_form():
@@ -141,7 +141,8 @@ def show_book_details(book_id):
     response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
     # print(response.url)
     book_json = response.json()
-    if book_json["totalItems"] == 1:
+    print (book_json)
+    if book_json["totalItems"] >= 1:
         summary = book_json["items"][0]["volumeInfo"]["description"]
         cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
         genres = book_json["items"][0]["volumeInfo"]["categories"]
@@ -188,7 +189,7 @@ def set_rating(book_id):
 
 @app.route('/authors')
 def show_authors():
-    """Show an authors list."""
+    """Display a list of all authors and the books they've written from the database."""
 
     author_dict = create_authors_dict()
 
@@ -200,27 +201,7 @@ def show_authors():
 def show_author_details(author):
 
     book_lst = Book.query.filter_by(author=author).all()
-    
-  
 
-    #get author bio from somewhere?
-    
-
-        # print(response.text)
-        # info = response.json()
-        # print(info.items().first)
-
-
-    # book_json = response.json()
-    # if book_json["totalItems"] == 1:
-    #     summary = book_json["items"][0]["volumeInfo"]["description"]
-    #     cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
-    #     genres = book_json["items"][0]["volumeInfo"]["categories"]
-
-    # else:
-    #     summary = None
-    #     cover_img = None
-    #     genres = None
 
     return render_template('author.html', author=author, book_lst=book_lst)
 
@@ -265,6 +246,7 @@ def gather_books():
 
    #set user_id in session
    session['user_id'] = user_id
+   flash('Crunching the numbers to find you something to read!')
 
 
 
@@ -353,10 +335,11 @@ def display_recommended_books():
         # print(response.url)
 
         book_json = response.json()
+        print(book_json)
         recommendation_info_dict[book.book_id] = book_json
         # print(recommendation_info_dict)
 
-        if book_json["totalItems"] == 1:
+        if book_json["totalItems"] >= 1:
             isbn13 = (book_json["items"][0]["volumeInfo"]['industryIdentifiers'][0]['identifier'])
         
             library_link_url = "https://labs.library.link/services/borrow/"

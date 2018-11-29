@@ -3,6 +3,7 @@
 function initSearchByAuthorFormHandler() {
     $('#search-by-author-form').on('submit', evt => {
         evt.preventDefault();
+        $('#bklist').empty();
 
         const formData = {
             author: $('#author-field').val()

@@ -3,6 +3,7 @@
 function initSearchByTitleFormHandler() {
     $('#search-by-title-form').on('submit', evt => {
         evt.preventDefault();
+        $('#bklist').empty();
 
         const formData = {
             title: $('#title-field').val()

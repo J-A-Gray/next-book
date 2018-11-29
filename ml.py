@@ -40,32 +40,6 @@ def get_nearest_neighbors(user_id):
 
     return neighbors_lst
 
-# get_nearest_neighbors(724)
-# print(get_nearest_neighbors(15))
-# print(get_nearest_neighbors(1023))
-# print(type(get_nearest_neighbors(345)))
-# print(get_nearest_neighbors(345))
-
-""" 
-Pre this calculation:
-take in ISBNs for five books - DONE
-query database for matching book_ids _ DONE
-create user_id, 5 rating_ids that have new user_id and each book_id and scores of 5 - DONE
-generate ratings csv file that has new user's ratings! (was using static data file previously) _ DONE
-pass new ratings file to Surprise !!!Memory limitations!!! It will not currently process the 6M ratings file: - DONE
-    how to split on the fly OR how to generate partial set that still contains new user's ratings?
-
-Get neighbors: ////The process above ////
-
-After this process:
-user_neighbors each have books they have reviewed positively (let's assume 5/5) DONE
-create one dictionary of book_ids from user_neighbors, (hopefully some books recommended by multiple neighbors), D
-get the five most popular book_ids DONE
-query database for title, author, isbn associated with those book_ids
-display list (eventually rich content based on API call with ISBN); 
-but for now list pf 5 books with title, author ISBN from database DONE
-
-"""
 
 
 
@@ -74,8 +48,6 @@ but for now list pf 5 books with title, author ISBN from database DONE
 
 
 
-# uid = str(1)
-# bid = str(5556)
 
 # pred = algo.predict(uid, bid, verbose=True)
 # pred is <class 'surprise.prediction_algorithms.predictions.Prediction'>
