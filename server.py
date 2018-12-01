@@ -247,7 +247,7 @@ def gather_books():
 
    #set user_id in session
    session['user_id'] = user_id
-   flash('Crunching the numbers to find you something to read!')
+   
 
 
 
@@ -333,27 +333,27 @@ def display_recommended_books():
         
 
         response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-        # print(response.url)
 
+        #convert to json
         book_json = response.json()
-        print(book_json)
 
+        #if there were results from the Google Books call
+        #add to book_id and the json to a dictionary
         if book_json["totalItems"] > 0: 
             recommendation_info_dict[book.book_id] = book_json
-            print(recommendation_info_dict)
 
         
+        #library.link requires isbn-13, so convert book.isbn to isbn-13
         isbn13 = convert_isbn(book.isbn)
-        print(isbn13)
-    
+
+        #use isbn-13 to get url for nearby library search
         library_link_url = "https://labs.library.link/services/borrow/"
         payload = {"isbn": "{}".format(isbn13)}
 
         response = requests.get(library_link_url, params=payload)
-        # print(response.url)
+        
+        #Add book_id and url to a link dictionary
         recommendation_link_dict[book.book_id] = response.url
-
-
 
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict)

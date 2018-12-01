@@ -15,8 +15,8 @@ function initCollectBooksFormHandler() {
             $.get('/search-by-book-id.json', {"book_id" : book}, (results) => {
                 console.log(results);
                 console.log(results.title);
-                let li = $('<li><input type="checkbox" class="bookCheckbox" name="'+ results.title + '" value="' + results.book_id + '"/>' + '<label for="' + results.book_id + '"></label></li>');
-                li.find('label').text(results.title);
+                let li = $('<li><a href="/books/'+ results.book_id + '"><input type="checkbox" class="bookCheckbox" name="'+ results.title + '" value="' + results.book_id + '"/>' + '<label for="' + results.book_id + '"></label></a></li>');
+                li.find('label').text(results.title + " by " + results.author);
                 $('#chosenbklist').append(li);
 
 
