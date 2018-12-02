@@ -21,9 +21,12 @@ from database_functions import add_anon_user, get_last_user_id, get_last_rating_
 app = Flask(__name__)
 
 GBOOKS_key = os.environ.get("GBOOKS")
+app_secret_key = os.environ.get("APPSECRET_KEY")
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
+# app.secret_key = os.environ.get("APPSECRET_KEY")
+
 
 # Normally, if you use an undefined variable in Jinja2, it fails
 # silently. This is horrible. Fix this so that, instead, it raises an
@@ -224,21 +227,20 @@ def gather_books():
    for key, value in books.items():
     book_id_lst.append(value)
 
+   print(book_id_lst) 
+
 
    user_id = session.get('user_id')
 
    if user_id == None:
    # create a user to hold ratings
        anon_user = add_anon_user()
-       print(anon_user)
-
+       
        # query db to get user id
        user_id = get_last_user_id()
-       print(user_id)
 
    #add ratings to db
    for id in book_id_lst:
-    #need a conditional here to check book_id is in db
     rating = add_rating(user_id, str(id))
     print(rating)
 
