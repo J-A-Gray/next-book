@@ -249,8 +249,6 @@ def gather_books():
    session['user_id'] = user_id
    
 
-
-
    return redirect('/recommendations')
 
 @app.route('/search-by-title.json')
