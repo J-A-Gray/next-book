@@ -53,7 +53,9 @@ action="/search-by-author.json">
     <form id="results-from-search" method="post" action="/search">
         <div class="form-group">
             <ul id="bklist"></ul>
-        <input type="submit" class="btn btn-primary">
+        <input type="submit" class="btn btn-primary" value="Loved">
+        <input type="submit" class="btn btn-primary" value="Hated">
+        <input type="reset" class="btn btn-primary">
         </div>
     </form>
     <script src="/static/chosen-books.js"></script>
@@ -62,13 +64,13 @@ action="/search-by-author.json">
 
 <div class="sidebar" id="books-for-recommendations">
     <span id="reference-message">
-        <h3>Get me recommendations from these books I've loved</h3>
+        <h3>Get me recommendations!</h3>
     </span>
 
     <form id="books-for-recommendations" method="post" action="/search">
         <div class="form-group">
         <ul id="chosenbklist"></ul>
-        <input type="submit" class="btn btn-primary">
+        <input type="submit" value="Get Recommendations!" class="btn btn-primary">
         </div>
     </form>
 

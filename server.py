@@ -220,14 +220,15 @@ def search_books():
 @app.route('/search', methods=['POST'])
 def gather_books():
    
-   #get MultiDict from client
+   #get MultiDict from client side
    books = request.form
-   book_id_lst=[]
+   book_id_dict={}
 
    for key, value in books.items():
-    book_id_lst.append(value)
-
-   print(book_id_lst) 
+    print(key)
+    print(value)
+    book_id_dict[key] = value
+   print(book_id_dict) 
 
 
    user_id = session.get('user_id')
@@ -240,8 +241,8 @@ def gather_books():
        user_id = get_last_user_id()
 
    #add ratings to db
-   for id in book_id_lst:
-    rating = add_rating(user_id, str(id))
+   for key, value in book_id_dict.items():
+    rating = add_rating(user_id, key, score=value)
     print(rating)
 
    #write csv file to send to Surprise library
