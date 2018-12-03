@@ -10,7 +10,13 @@ from outward import write_rating_data
 from ml import get_nearest_neighbors
 
 
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst
+from database_functions import (add_anon_user, get_last_user_id, 
+                                get_last_rating_id, get_book_id,
+                                add_rating, create_user_list,
+                                create_neighbors_book_dict, get_recommendations_lst)
+
+# Alternative:
+from database_functions import *
 
 
 app = Flask(__name__)
@@ -29,11 +35,13 @@ def index():
     """Homepage."""
     return render_template("homepage.html")
 
+
 @app.route('/register', methods=['GET'])
 def register_form():
     """Display form for user signup."""
 
     return render_template("registration_form.html")
+
 
 @app.route('/register', methods=['POST'])
 def register_for_site():
@@ -53,11 +61,13 @@ def register_for_site():
 
     return redirect('/')
 
+
 @app.route('/login', methods=['GET'])
 def login_form():
     """Display login form."""
 
     return render_template("login_form.html")
+
 
 @app.route('/login', methods=['POST'])
 def login_process():
@@ -82,12 +92,14 @@ def login_process():
     flash('Welcome!')
     return redirect(f'/users/{user.user_id}')
 
+
 @app.route('/logout')
 def logout():
     """Log user out."""
     del session['user_id']
     flash("Bye! Happy Reading!")
     return redirect('/')
+
 
 @app.route('/users')
 def user_list():
@@ -96,11 +108,13 @@ def user_list():
     users = User.query.all()
     return render_template('user_list.html', users=users)
 
+
 @app.route('/users/<int:user_id>')
 def user_detail(user_id):
 
     user = User.query.get(user_id)
     return render_template('user.html', user=user)
+
 
 @app.route('/books')
 def show_books():
@@ -109,6 +123,7 @@ def show_books():
     books = Book.query.order_by('title').all()
 
     return render_template('book_list.html', books=books)
+
 
 @app.route('/books/<int:book_id>', methods=['GET'])
 def show_book_details(book_id):
@@ -133,6 +148,7 @@ def show_book_details(book_id):
 
 
     return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating)
+
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):
@@ -163,48 +179,33 @@ def set_rating(book_id):
 
     return redirect(f'/books/{book_id}')
 
+
 @app.route('/lovedbooks', methods=['GET'])
 def book_form():
 
     return render_template('reference_books.html')
 
+
 @app.route('/lovedbooks', methods=['POST'])
 def process_books():
 
-    b1 = request.form['book1']
-    b2 = request.form['book2']
-    b3 = request.form['book3']
-    b4 = request.form['book4']
-    b5 = request.form['book5']
-
-    # create a user to hold ratings
+    # see reference_books.html for additional suggestions!
+    # Take input from textarea and split into a list:
+    book_data = request.form.get('books').split()
     anon_user = add_anon_user()
 
-    # query db to get user id
-    anon_id = get_last_user_id()
-
-    # query db to get book_ids
-    book1_id = get_book_id(str(b1))
-    book2_id = get_book_id(str(b2))
-    book3_id = get_book_id(str(b3))
-    book4_id = get_book_id(str(b4))
-    book5_id = get_book_id(str(b5))
-
-    #add ratings to db
-    add_rating(anon_id, book1_id)
-    add_rating(anon_id, book2_id)
-    add_rating(anon_id, book3_id)
-    add_rating(anon_id, book4_id)
-    add_rating(anon_id, book5_id)
+    book_ids = [get_book_id(book) for book in book_data]
+    for book_id in book_ids:
+        add_rating(anon_user.id, book_id)
 
     #write csv file to send to Surprise library
     write_rating_data()
 
     #set user_id in session
-    session['user_id'] = anon_id
-
+    session['user_id'] = anon_user.id
 
     return redirect('/lovedbooksresults')
+
 
 @app.route('/lovedbooksresults', methods=['GET'])
 def display_favorite_books():
@@ -222,6 +223,7 @@ def display_favorite_books():
     return render_template('loved_books_result.html', recommendation_lst=recommendation_lst)
 
 
+# SEE run.py FOR ALTERNATIVE SETUP!
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
@@ -236,3 +238,4 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')
+
