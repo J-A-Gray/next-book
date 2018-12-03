@@ -225,10 +225,8 @@ def gather_books():
    book_id_dict={}
 
    for key, value in books.items():
-    print(key)
-    print(value)
     book_id_dict[key] = value
-   print(book_id_dict) 
+ 
 
 
    user_id = session.get('user_id')
@@ -355,6 +353,12 @@ def display_recommended_books():
         
         #Add book_id and url to a link dictionary
         recommendation_link_dict[book.book_id] = response.url
+
+    user = User.query.get(user_id)
+    print(user.email)
+    if user.email == None: #only registered users have emails, so we want to logout the anon user
+        del session['user_id']
+   
 
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict)

@@ -20,6 +20,7 @@ function initCollectBooksFormHandler() {
                 let set = $('<li><fieldset><a href="/books/'+ results.book_id + '"><legend>Placeholder for title</legend></a><p><input type="radio" name="'+ results.book_id + '" id="'+ results.book_id + '" value=5 checked><label for="loved">Loved it</label></p><p><input type="radio"  name="'+ results.book_id + '" id="'+ results.book_id + '" value=1><label for="hated">Hated it</label></p></fieldset></li>');
                 set.find('legend').text(results.title + " by " + results.author);
                 $('#chosenbklist').append(set);
+        $($('#search-results').addClass('hidden'))
 
 
     });
