@@ -1,7 +1,8 @@
-from model_testing import *
+from model import *
 from ml import get_nearest_neighbors
 
 init_app()
+
 
 def add_anon_user():
     """Adds a user_id for a non-logged in user from the landing page."""
@@ -11,6 +12,7 @@ def add_anon_user():
     db.session.add(intake_user)
     db.session.commit()
 
+
 def get_last_user_id():
     """Queries database for last created user id."""
 
@@ -18,12 +20,14 @@ def get_last_user_id():
 
     return user.user_id
 
+
 def get_last_rating_id():
     """Queries database for last created rating id."""
 
     rating = Rating.query.order_by(Rating.rating_id.desc()).first()
 
     return rating.rating_id
+
 
 def get_book_id(isbn):
     """Gets a book id for database for a given ISBN"""
@@ -40,6 +44,7 @@ def add_rating(user_id, book_id, score=5):
     db.session.add(rating)
     db.session.commit()
 
+
 def create_user_list(user_id):
     """Create a list of books rated by the user"""
     user_book_lst=[]
@@ -51,6 +56,7 @@ def create_user_list(user_id):
         user_book_lst.append(book)
 
     return user_book_lst
+
 
 def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
     """Create a dictionary of Book objects rated by neighbors of user but not in users input"""
@@ -74,6 +80,7 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
     
     return neighbors_book_dict
 
+
 def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
 
     times_recomended = {}
@@ -82,9 +89,9 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
     print(times_recomended)
 
     tuples = neighbors_book_dict.items()
-    for item in tuples:
-        if item[1] in times_recomended:
-            times_recomended[item[1]].append(item[0])
+    for new_item, item in neightbors_book_dict.items():
+        if item in times_recomended:
+            times_recomended[item].append(new_item)
 
     print(times_recomended)
 

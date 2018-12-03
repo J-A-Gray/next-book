@@ -1,8 +1,5 @@
 import os
-from surprise import KNNBaseline
-from surprise import Dataset
-from surprise import Reader
-from surprise import get_dataset_dir
+from surprise import KNNBaseline, Dataset, Reader, get_dataset_dir
 
 
 def get_nearest_neighbors(user_id):
