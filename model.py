@@ -2,6 +2,10 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
+# Already installed with Flask: 
+# http://werkzeug.pocoo.org/docs/0.14/utils/#module-werkzeug.security
+from werkzeug.security import generate_password_hash, check_password_hash 
+
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
 # object, where we do most of our interactions (like committing, etc.)
@@ -17,19 +21,20 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, nullable=True)
     password = db.Column(db.String(64), nullable=True)
     
     def __repr__(self):
         return f"<User user_id={self.user_id} email={self.email}>"
+
 
 class Book(db.Model):
     """Books of NextBook website."""
     
     __tablename__ = "books"
     
-    book_id = db.Column(db.Integer, primary_key=True) #book id from data set
+    id = db.Column(db.Integer, primary_key=True) #book id from data set
     work_id = db.Column(db.Integer, unique=True) #maps to work_id in books.csv, but to book_id in ratings.csv
     isbn = db.Column(db.String(13), unique=True) #platform and dataset agnostic, generally all books post-1970 have one
     title = db.Column(db.String(600))
@@ -38,23 +43,24 @@ class Book(db.Model):
 
     def __repr__(self):
 
-        return f"<Book book_id={self.book_id} title={self.title} author={self.author}>"
+        return f"<Book {self.book_id} | {self.title[:12]}, by {self.author}>"
+
 
 class Rating(db.Model):
     """Rating of NextBook website."""
 
     __tablename__ = "ratings"
 
-    rating_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     score = db.Column(db.Integer)
 
     book = db.relationship('Book',
-                            backref=db.backref('ratings', order_by=rating_id))
+                            backref=db.backref('rating'))
 
     user = db.relationship('User', 
-                            backref=db.backref('ratings', order_by=rating_id))
+                            backref=db.backref('ratings'))
 
     def __repr__(self):
 
@@ -63,14 +69,23 @@ class Rating(db.Model):
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, dbname='nextbook'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///nextbook'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql:///{dbname}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
+
+
+def init_app():
+    # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
+    from flask import Flask
+    app = Flask(__name__)
+
+    connect_to_db(app)
+    print("Connected to DB.")
 
 
 if __name__ == "__main__":
