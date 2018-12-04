@@ -10,10 +10,32 @@
 <body>
     NextBook
     {% if 'user_id' in session %}
-        <input type="button" a href='/logout' class="btn btn-primary">Log out</a>
+        <div class="topnav">
+          <a class="active" href="/">Home</a> 
+          <!--todo remove and add class active current page basis -->
+          <a href="/search">Search</a>
+          <a href="/books">Books</a>
+          <div class="login-container">
+            <form action="/logout">
+              <button type="submit">Logout</button>
+            </form>
+          </div>
+        </div>
     
     {% else %}
-        <a href='/login' class="btn btn-primary" style='background-color: teal'>Log in</a>
+    <div class="topnav">
+      <a class="active" href="/">Home</a> 
+      <!--todo remove and add class active current page basis -->
+      <a href="/search">Search</a>
+      <a href="/books">Books</a>
+      <div class="login-container">
+        <form action="/login" method="POST">
+          <input type="text" placeholder="Email" name="email" required>
+          <input type="password" placeholder="Password" name="password" required>
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
     {% endif %}
         
     <hr>
