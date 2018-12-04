@@ -146,7 +146,7 @@ def show_book_details(book_id):
     # print(response.url)
     book_json = response.json()
     print (book_json)
-    if book_json["totalItems"] >= 1:
+    if book_json["totalItems"] >= 1: # pragma: no cover
         summary = book_json["items"][0]["volumeInfo"]["description"]
         cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
         genres = book_json["items"][0]["volumeInfo"]["categories"]
@@ -222,6 +222,7 @@ def gather_books():
    
    #get MultiDict from client side
    books = request.form
+   print(books)
    book_id_dict={}
 
    for key, value in books.items():
@@ -347,12 +348,13 @@ def display_recommended_books():
 
         #use isbn-13 to get url for nearby library search
         library_link_url = "https://labs.library.link/services/borrow/"
-        payload = {"isbn": "{}".format(isbn13)}
+        payload = {"isbn": "{}".format(isbn13), "embed": "true"}
 
         response = requests.get(library_link_url, params=payload)
         
         #Add book_id and url to a link dictionary
         recommendation_link_dict[book.book_id] = response.url
+    print(recommendation_link_dict)
 
     user = User.query.get(user_id)
     print(user.email)

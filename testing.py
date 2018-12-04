@@ -14,14 +14,30 @@ class NextBookTests(unittest.TestCase):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     def test_homepage(self):
+        """Test homepage"""
         result = self.client.get("/")
+        self.assertEqual(result.status_code, 200)
         self.assertIn(b"Nextbook", result.data)
 
-    # def test_lovedbooks(self):
-    #     result = self.client.get('/lovedbooks')
-    #     self.assertIn(b"Find Your Next Book", result.data)
+    def test_search(self):
+        """Test search page inital rendering"""
+        result = self.client.get('/search')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"Search", result.data)
 
-    # def test_lovedbooksresults(self):
+    def test_register_form(self):
+        """Test register page intital rendering"""
+        result = self.client.get('/register')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h1>Register with", result.data)
+
+    def test_login_form(self):
+        """Test login page intial rendering"""
+        result = self.client.get('/login')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h1>Login</h1>", result.data)
+
+     # def test_recommen(self):
     #     result = self.client.get('/lovedbooksresults', data={'book1': '142407577',
     #                                                    'book2': '1934137197', 
     #                                                    'book3': '1713221', 
@@ -33,9 +49,17 @@ class NextBookTests(unittest.TestCase):
     #     self.assertIn(b"I think you might like", result.data)
     #     self.assertNotIn(b'Find', result.data)
 
+    
 
 
+class NextBookTestsLogInLogOut(unittest.TestCase):
+    """Test log in and log out"""
 
+    def setUp(self):
+        self.client = app.test_client()
+        app.config['TESTING'] = True
+        app.config['SECRET_KEY'] = "ABC"
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 class NextBookTestsDatabase(unittest.TestCase):
@@ -72,12 +96,88 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertEqual(user_count, 5)
         self.assertEqual(rating_count, 10)
 
+    def test_login_process(self):
+        """Test if an exisiting user can login"""
+        result = self.client.post('/login', 
+                                    data={'email': '123@test.com', 
+                                          'password': 'password' }, 
+                                          follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h2>Books You\'ve Rated</h2>", result.data)
+
+    def test_logout_session(self):
+        """Sets session user_id, tests if user can log out"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = 1
+        result = c.get('/logout', follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        #redirects to homepage if successful, so we'll test for that
+        self.assertIn(b">Log in</a>", result.data)
+        self.assertIn(b" Bye! Happy Reading!", result.data)
+
+    def test_register_process(self):
+        """Test if new user can register"""
+        result = self.client.post('/register', data={'email': '911@test.com', 
+                                          'password': 'password' }, 
+                                          follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        #redirects to login page if successful, so we'll test for that
+        self.assertIn(b"<h1>Login</h1>", result.data) 
 
     def test_books(self):
-        """Test that book list route is pulling data from the db """
+        """Test that book list route is pulling data from the db and displaying on page """
         result = self.client.get('/books')
+        self.assertEqual(result.status_code, 200)
         self.assertIn(b"The White Lioness", result.data)
         self.assertNotIn(b"Brief History of Time", result.data)
+        self.assertIn(b"<h1>Books</h1>", result.data)
+
+    def test_book_detail(self):
+        """Test if individual book pages pull data and render"""
+        result = self.client.get('/books/8387')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h2>Past Ratings", result.data)
+        self.assertIn(b"<h1>The White Lioness (Kurt Wallander, #3)</h1>", result.data)
+
+        #with a logged in user
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = 1
+        result = c.post('/books/8387', data={'submitted_rating': 5},
+                        follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h2>Rate The White Lioness (Kurt Wallander, #3)!</h2>", result.data) 
+
+    def test_authors_route(self):
+        """Test if list of authors and books pulls data from the database and renders page"""
+        result = self.client.get('/authors')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h1>Authors</h1>", result.data)
+        self.assertIn(b"Nathan Filer</a>", result.data)
+
+    def test_individual_author_route(self):
+        """Test if individual author page pulls data from db and renders page"""
+        result = self.client.get('/authors/Nathan Filer')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b">The Shock of the Fall</a>", result.data)
+        self.assertIn(b"<h1>Nathan Filer</h1>", result.data)
+
+    def test_individual_user_route(self):
+        """Test if individual user page pulls data from db and renders"""
+        result = self.client.get('/users/1')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h2>Books You\'ve Rated</h2>", result.data)
+        self.assertIn(b" <h1>User: 1 </h1>", result.data)
+
+    # def test_search_process(self):
+
+    #     result = self.client.post('/search', data={'books' : [('8387', 5), ('7327', 5)]},
+    #                               follow_redirects=True)
+    #     self.assertEqual(result.status_code, 200)
+    #     # self.assertIn(b"ohoihf", result.data)
+
+    
 
 
     def test_get_last_user_id(self):
@@ -85,7 +185,6 @@ class NextBookTestsDatabase(unittest.TestCase):
         user_id = get_last_user_id()
         self.assertEqual(user_id, 5)
         self.assertNotEqual(user_id, 10000)
-
 
     def test_add_anon_user(self):
 
