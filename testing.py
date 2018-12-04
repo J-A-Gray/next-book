@@ -79,6 +79,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         db.create_all()
         example_data()
 
+        
     def tearDown(self):
         """Do at end of every test."""
 
@@ -169,6 +170,8 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn(b"<h2>Books You\'ve Rated</h2>", result.data)
         self.assertIn(b" <h1>User: 1 </h1>", result.data)
+
+
 
     # def test_search_process(self):
 
