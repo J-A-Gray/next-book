@@ -327,7 +327,7 @@ def display_recommended_books():
     recommendation_link_dict = {}
 
     #get summary, genres and cover image from Google Books
-    for book in recommendation_lst:
+    for book in recommendation_lst: # pragma: no cover
         url = "https://www.googleapis.com/books/v1/volumes"
         payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
         
@@ -365,7 +365,7 @@ def display_recommended_books():
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict)
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
     app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False

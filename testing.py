@@ -73,7 +73,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
         #connect to test database
-        connect_to_db(app, db_uri='postgresql:///testbook') #not connecting to the testbook db
+        connect_to_db(app, db_uri='postgresql:///testbook') 
 
         #create the tables and add the sample data
         db.create_all()
@@ -114,7 +114,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         result = c.get('/logout', follow_redirects=True)
         self.assertEqual(result.status_code, 200)
         #redirects to homepage if successful, so we'll test for that
-        self.assertIn(b">Log in</a>", result.data)
+        self.assertIn(b"Login</button>", result.data)
         self.assertIn(b" Bye! Happy Reading!", result.data)
 
     def test_register_process(self):
@@ -140,6 +140,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn(b"<h2>Past Ratings", result.data)
         self.assertIn(b"<h1>The White Lioness (Kurt Wallander, #3)</h1>", result.data)
+        self.assertNotIn(b"Brief History of Time", result.data)
 
         #with a logged in user
         with self.client as c:
@@ -205,29 +206,24 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertLess(rating_id, 11)
 
 
-    # def test_get_book_id(self):
-    #     """Test to get a book_id from an ISBN and display title on book_id page"""
+    def test_get_book_id(self):
+        """Test to get a book_id from an ISBN and display title on book_id page"""
+        book_id = get_book_id('99464691')
+        self.assertEqual(8387, book_id)
 
-    #     book_id = get_book_id(isbn='7491433')
-    #     result = self.client.get('/books/'+ str(book_id))
-    #     self.assertIn(b"The Shock of the Fall", result.data)
-    #     self.assertNotIn(b"Brief History of Time", result.data)
 
-    # def test_add_rating(self):
+    def test_add_rating(self):
 
-    #     rating = add_rating(user_id=1, book_id=7695)
+        rating = add_rating(user_id=1, book_id=7695, score=3)
+        self.assertEqual(3, rating.score)
+        self.assertIsInstance(rating, Rating)
 
-    #     self.assertEqual(rating.book_id, 7695)
 
-    #     result = self.client.get('/books/' + str(rating.book_id))
-    #     self.assertIn(b"/users/1", result.data)
-    #     self.assertNotIn(b"/users/15", result.data)
 
 
     def test_create_user_list(self):
 
         user_book_lst = create_user_list(user_id=1)
-
         self.assertIsInstance(user_book_lst[0], Book)
 
 
@@ -240,6 +236,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         neighbors_dict = create_neighbors_book_dict(neighbors_user_id_lst=['1','2'], user_book_lst=user_book_id_lst, score=5)
         for key in neighbors_dict.keys():
             self.assertIsInstance(key, Book)
+        
 
         
         neighbors_book_lst = []
@@ -283,25 +280,25 @@ class NextBookTestsDatabase(unittest.TestCase):
         author_dict=create_authors_dict()
         self.assertIn("Cecelia Ahern", author_dict.keys())
         self.assertIn('Death of Kings', author_dict['Bernard Cornwell'][0].title)
+   
+    def test_get_recommendations_lst(self):
+        """Test if recommendations list is generated from the rated items of the closest neighbors"""
+        user_book_lst = create_user_list(user_id=1)
+        user_book_id_lst = []
+        for book in user_book_lst:
+            user_book_id_lst.append(book.book_id)
+        book_dict = create_neighbors_book_dict(neighbors_user_id_lst=['1','2'], user_book_lst=user_book_id_lst, score=5)
+        rec_lst = get_recommendations_lst(book_dict, num_neighbors=2, recs=1)
+
+        self.assertIn('Death of Kings', rec_lst[0].title)
+        for item in rec_lst:
+            self.assertIsInstance(item, Book)
 
 
-    
-    # def test_get_recommendations_lst(self):
-
-    #     user_book_lst = create_user_list(user_id=1)
-    #     user_book_id_lst = []
-    #     for book in user_book_lst:
-    #         user_book_id_lst.append(book.book_id)
-
-    #     neighbors_book_dict = create_neighbors_book_dict(neighbors_user_id_lst=['1','2'], user_book_lst=[], score=5)
-
-    #     recommendations = get_recommendations_lst(neighbors_book_dict=neighbors_book_dict, num_neighbors=4)
-    #     self.assertIsInstance(recommendations[0], Book)
-
-#Write a test to test csv writer from outward.py
 
 
-if __name__ == "__main__":
+
+if __name__ == "__main__": # pragma: no cover
 
     unittest.main()
     init_app()

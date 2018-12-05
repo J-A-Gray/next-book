@@ -112,9 +112,10 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
                         neighbors_book_dict[book] = 1
 
     
+    print(neighbors_book_dict)
     return neighbors_book_dict
 
-def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
+def get_recommendations_lst(neighbors_book_dict, num_neighbors=10, recs=5):
 
     times_recomended = {}
     for num in range(num_neighbors, 0, -1):
@@ -128,12 +129,12 @@ def get_recommendations_lst(neighbors_book_dict, num_neighbors=10):
 
     recommendation_lst = []
 
-    while len(recommendation_lst) < 5:
+    while len(recommendation_lst) < recs:
 
         for num in range(num_neighbors, 0, -1): #range goes from length of neighbors to zero, counting backwards
             if len(times_recomended[num]) > 0: #non empty nested lists
                 for book in times_recomended[num]:
-                    if book not in recommendation_lst and len(recommendation_lst) < 5:
+                    if book not in recommendation_lst and len(recommendation_lst) < recs:
                         recommendation_lst.append(book)
 
 
