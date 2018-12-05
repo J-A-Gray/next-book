@@ -5,80 +5,99 @@ NextBook - Search
 
 {% block content %}
 
-<div>Search by title!</div>
-<div>
-<form id="search-by-title-form" method="get" 
-action="/search-by-title.json">
-    <div class="form-group">
-        <label for="title-field">Title</label>
-        <input type="text" 
-               class="form-control" 
-               name="title" 
-               id="title-field" 
-               placeholder="Master and Margarita"
-               autocomplete="off">
-    </div>
-    <div class="form-group">
-        <input type="submit" class="btn btn-primary">
-    </div>
-</form>
-</div>
-<br>
-<br>
-<div>Search by author!</div>
-<div>
-<form id="search-by-author-form" method="get" 
-action="/search-by-author.json">
-    <div class="form-group">
-        <label for="author-field">Author</label>
-        <input type="text" 
-               class="form-control" 
-               name="author" 
-               id="author-field" 
-               placeholder="Octavia Butler"
-               autocomplete="off">
-    </div>
-    <div class="form-group">
-        <input type="submit" class="btn btn-primary">
-    </div>
-</form>
-
-
-<script src="/static/book-by-title.js"></script>
-<script src="/static/book-by-author.js"></script>
-</div>
-
-<br>
-<br>
-<br>
-
-<div id="search-results" class="hidden">
-    <span id="search-results-message">
-        <h3>Here are your results!</h3>
-    </span>
-    <form id="results-from-search" method="post" action="/search">
-        <div class="form-group">
-            <ul id="bklist"></ul>
-            <input type="submit" class="btn btn-primary" value="Add to List">
-            <input type="reset" class="btn btn-primary">
+<!-- Page Header -->
+    <header class="masthead" style="background-image: url('static/book-mat.jpg')">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="page-heading">
+              <h1>Find your next book!</h1>
+              <span class="subheading">Tell us books you've loved (or hated!) and we'll help you find a new favorite.</span>
+            </div>
+          </div>
         </div>
-    </form>
+      </div>
+    </header>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-6 mx-auto">
+            <h2>Search by title!</h2>
+            <form id="search-by-title-form" method="get" action="/search-by-title.json">
+                <div class="form-group">
+                    <input type="text" 
+                           class="form-control" 
+                           name="title" 
+                           id="title-field" 
+                           placeholder="Master and Margarita"autocomplete="off">
+                    <br>
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-6 col-md-6 mx-auto">
+            <h2>Search by author!</h2>
+            <form id="search-by-author-form" method="get" 
+                  action="/search-by-author.json">
+                <div class="form-group">
+                    <input type="text" 
+                           class="form-control" 
+                           name="author" 
+                           id="author-field" 
+                           placeholder="Octavia Butler"
+                           autocomplete="off">
+                    <br>
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="/static/book-by-title.js"></script>
+    <script src="/static/book-by-author.js"></script>
+
+    <br>
+    <br>
+    <br>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-6 mx-auto">
+            <div id="search-results" class="hidden">
+                <span id="search-results-message">
+                    <h3>Here are your results!</h3>
+                </span>
+            <form id="results-from-search" method="post" action="/search">
+                <div class="form-group">
+                    <ul id="bklist" class="list-unstyled"></ul>
+                        <input type="submit" class="btn btn-primary" value="Add to List">
+                        <input type="reset" class="btn btn-primary">
+                </div>
+            </form>
+            </div>
     <script src="/static/chosen-books.js"></script>
-</div>
+        </div>
+    </div>
 
 
-<div class="sidebar hidden" id="books-for-recommendations">
+<div class="hidden" id="books-for-recommendations">
     <span id="reference-message">
         <h3>Get me recommendations!</h3>
     </span>
 
     <form id="books-for-recommendations" method="post" action="/search">
         <div class="form-group">
-        <ul id="chosenbklist"></ul>
+        <ul id="chosenbklist" class="list-unstyled"></ul>
         <input type="submit" value="Get Recommendations!" class="btn btn-primary">
         </div>
     </form>
 
 </div>
+
+
+
+    <hr>
 
 {% endblock %}

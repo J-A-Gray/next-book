@@ -1,12 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
+    <!-- Page Header -->
+    <header class="masthead" style="background-image: url('static/book-stack.jpg')">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="site-heading">
+              <h1>Fight Boredom Read a Book!</h1>
+              <span class="subheading">Using machine learning to find the new things to read!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-<h1>Nextbook</h1>
+    <h1>Nextbook</h1>
 
-<h2>Books</h2>
-<p><a href="/books">View all books</a></p>
+    <h2>Books</h2>
+    <p><a href="/books">View all books</a></p>
 
-<h2>Authors</h2>
-<p><a href="/authors">View all authors</a></p>
+    <h2>Authors</h2>
+    <p><a href="/authors">View all authors</a></p>
 
+    
 {% endblock %}
