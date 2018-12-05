@@ -198,7 +198,7 @@ class NextBookTestsDatabase(unittest.TestCase):
 
 
     def test_get_last_rating_id(self):
-        """Tests if last rating id can be retrieve from the database"""
+        """Tests if last rating id can be retrieved from the database"""
 
         rating_id = get_last_rating_id()
 
@@ -207,27 +207,26 @@ class NextBookTestsDatabase(unittest.TestCase):
 
 
     def test_get_book_id(self):
-        """Test to get a book_id from an ISBN and display title on book_id page"""
+        """Test to get a book_id from the db using an ISBN"""
         book_id = get_book_id('99464691')
         self.assertEqual(8387, book_id)
 
 
     def test_add_rating(self):
-
+        """Test to add rating to db"""
         rating = add_rating(user_id=1, book_id=7695, score=3)
         self.assertEqual(3, rating.score)
         self.assertIsInstance(rating, Rating)
 
 
-
-
     def test_create_user_list(self):
-
+        """Test if a list of the books a user has rated is retrieved from the db"""
         user_book_lst = create_user_list(user_id=1)
         self.assertIsInstance(user_book_lst[0], Book)
 
 
     def test_create_neighbors_book_dict(self):
+        """Test if a dictionary of book objects, rated by the nearest neighbors of the user, is created"""
         user_book_lst = create_user_list(user_id=1)
         user_book_id_lst = []
         for book in user_book_lst:
@@ -237,7 +236,6 @@ class NextBookTestsDatabase(unittest.TestCase):
         for key in neighbors_dict.keys():
             self.assertIsInstance(key, Book)
         
-
         
         neighbors_book_lst = []
         for key in neighbors_dict.keys():
