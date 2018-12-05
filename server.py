@@ -145,13 +145,33 @@ def show_book_details(book_id):
     response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
     # print(response.url)
     book_json = response.json()
-    print (book_json)
+
+    genres = []
     if book_json["totalItems"] >= 1: # pragma: no cover
         summary = book_json["items"][0]["volumeInfo"]["description"]
-        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"]
+        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
         genres = book_json["items"][0]["volumeInfo"]["categories"]
 
-    else:
+    elif book_json["totalItems"] < 1: # pragma: no cover
+        #library.link requires isbn-13, so convert book.isbn to isbn-13
+        isbn13 = convert_isbn(book.isbn)
+
+        #use isbn-13 to get url for nearby library search
+        open_library_url = "https://openlibrary.org/api/books"
+        payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
+
+        response_ol = requests.get(open_library_url, params=payload)
+        if response_ol:
+            response_ol_json = response_ol.json()
+            print(response_ol_json)
+            isbnstring = "ISBN:{}".format(isbn13)
+            cover_img = response_ol_json[isbnstring]["cover"]["medium"]
+            
+            summary = response_ol_json[isbnstring]['excerpts'][0]['text']
+            for subject in response_ol_json[isbnstring]['subjects'][:3]:
+                genres.append(subject['name'])
+    
+    else: # pragma: no cover
         summary = None
         cover_img = None
         genres = None
@@ -253,8 +273,8 @@ def gather_books():
 
    return redirect('/recommendations')
 
-@app.route('/search-by-title.json')
-def search_books_by_title():
+@app.route('/search-by-title.json') 
+def search_books_by_title(): # pragma: no cover
 
     title = request.args.get("title")
  
@@ -273,7 +293,7 @@ def search_books_by_title():
         return "No books found."
 
 @app.route('/search-by-author.json')
-def search_books_by_author():
+def search_books_by_author(): # pragma: no cover
 
     author = request.args.get("author")
 
@@ -291,7 +311,7 @@ def search_books_by_author():
         return "No books found."
 
 @app.route('/search-by-book-id.json')
-def search_books_by_book_id():
+def search_books_by_book_id(): # pragma: no cover
 
     book_id = int(request.args.get("book_id"))
     print(book_id)
@@ -325,9 +345,23 @@ def display_recommended_books():
 
     recommendation_info_dict = {}
     recommendation_link_dict = {}
-
-    #get summary, genres and cover image from Google Books
+    
     for book in recommendation_lst: # pragma: no cover
+        
+        #library.link requires isbn-13, so convert book.isbn to isbn-13
+        isbn13 = convert_isbn(book.isbn)
+
+        #use isbn-13 to get url for nearby library search
+        library_link_url = "https://labs.library.link/services/borrow/"
+        payload = {"isbn": "{}".format(isbn13), "embed": "true"}
+
+        response = requests.get(library_link_url, params=payload)
+        
+        #Add book_id and url to a link dictionary
+        recommendation_link_dict[book.book_id] = response.url
+        
+
+        #get summary, genres and cover image from Google Books
         url = "https://www.googleapis.com/books/v1/volumes"
         payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
         
@@ -342,28 +376,38 @@ def display_recommended_books():
         if book_json["totalItems"] > 0: 
             recommendation_info_dict[book.book_id] = book_json
 
-        
-        #library.link requires isbn-13, so convert book.isbn to isbn-13
-        isbn13 = convert_isbn(book.isbn)
+        #begin Open Library API call
+        open_library_url = "https://openlibrary.org/api/books"
+        payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
 
-        #use isbn-13 to get url for nearby library search
-        library_link_url = "https://labs.library.link/services/borrow/"
-        payload = {"isbn": "{}".format(isbn13), "embed": "true"}
-
-        response = requests.get(library_link_url, params=payload)
+        response_ol = requests.get(open_library_url, params=payload)
+        if response_ol:
+            rec_excerpt_dict = {}
+            response_ol_json = response_ol.json()
+            isbnstring = "ISBN:{}".format(isbn13)
+            if 'excerpts' in response_ol_json[isbnstring]:
+                excerpt = response_ol_json[isbnstring]['excerpts'][0]['text']
+                rec_excerpt_dict[book.book_id] = excerpt
+        # else:
         
-        #Add book_id and url to a link dictionary
-        recommendation_link_dict[book.book_id] = response.url
-    print(recommendation_link_dict)
+        #     #use isbn-13 to get url for nearby library search
+        #     open_library_url = "https://openlibrary.org/api/books"
+        #     payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
+
+        #     response_ol = requests.get(open_library_url, params=payload)
+        #     if response_ol:
+        #         response_ol_json = response_ol.json()
+        #         print(response_ol_json)
+
+        #         recommendation_info_dict[book.book_id] = response_ol_json
 
     user = User.query.get(user_id)
-    print(user.email)
     if user.email == None: #only registered users have emails, so we want to logout the anon user
         del session['user_id']
    
 
 
-    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict)
+    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict, rec_excerpt_dict=rec_excerpt_dict)
 
 if __name__ == "__main__": # pragma: no cover
     # We have to set debug=True here, since it has to be True at the

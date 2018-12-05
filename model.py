@@ -79,7 +79,7 @@ class Rating(db.Model):
 
 ##############################################################################
 # Helper functions
-def init_app():
+def init_app(): # pragma: no cover
     from flask import Flask
     app = Flask(__name__)
 
@@ -108,11 +108,11 @@ def example_data():
     user5 = User(user_id=5, email='654@test.com', password='password')
 
     #sample books
-    book1 = Book(book_id=7627, work_id=16683183, isbn='7331789', title='Death of Kings (The Saxon Stories, #6)', author='Bernard Cornwell')
-    book2 = Book(book_id=7695, work_id=16947613, isbn='7350430', title='The Time of My Life', author='Cecelia Ahern')
-    book3 = Book(book_id=69, work_id=15524542, isbn='7442912', title='Insurgent (Divergent #2)', author='Veronica Roth')
-    book4 = Book(book_id=3327, work_id=23906880, isbn='7491433', title='The Shock of the Fall', author='Nathan Filer')
-    book5 = Book(book_id=8387, work_id=67116, isbn='99464691', title='The White Lioness (Kurt Wallander, #3)', author='Henning Mankell')
+    book1 = Book(book_id=7627, work_id=16683183, isbn='0007331789', title='Death of Kings (The Saxon Stories, #6)', author='Bernard Cornwell')
+    book2 = Book(book_id=7695, work_id=16947613, isbn='0007350430', title='The Time of My Life', author='Cecelia Ahern')
+    book3 = Book(book_id=69, work_id=15524542, isbn='0007442912', title='Insurgent (Divergent #2)', author='Veronica Roth')
+    book4 = Book(book_id=3327, work_id=23906880, isbn='0007491433', title='The Shock of the Fall', author='Nathan Filer')
+    book5 = Book(book_id=8387, work_id=67116, isbn='0099464691', title='The White Lioness (Kurt Wallander, #3)', author='Henning Mankell')
 
 
     #sample ratings
@@ -142,7 +142,7 @@ def connect_to_db(app, db_uri='postgresql:///nextbook'):
     db.init_app(app)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     # As a convenience, if we run this module interactively, it will leave
     # you in a state of being able to work with the database directly.
 

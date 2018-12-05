@@ -17,8 +17,9 @@
         {% if 'user_id' not in session %}
             <div class="login-container">
                 <form action="/login" method="POST">
-                    <input type="text" placeholder="Email" name="email" required>
-                    <input type="password" placeholder="Password" name="password" required>
+                    <input type="text" placeholder="Email" name="email" autocomplete="username" required>
+                    <input type="password" placeholder="Password" name="password" 
+                            autocomplete="current-password" required>
                     <button type="submit">Login</button>
                 </form>
             </div>

@@ -208,7 +208,7 @@ class NextBookTestsDatabase(unittest.TestCase):
 
     def test_get_book_id(self):
         """Test to get a book_id from the db using an ISBN"""
-        book_id = get_book_id('99464691')
+        book_id = get_book_id('0099464691')
         self.assertEqual(8387, book_id)
 
 
@@ -292,11 +292,10 @@ class NextBookTestsDatabase(unittest.TestCase):
         for item in rec_lst:
             self.assertIsInstance(item, Book)
 
+  
 
 
-
-
-if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__": 
 
     unittest.main()
     init_app()

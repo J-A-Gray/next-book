@@ -12,46 +12,36 @@
             <div id="book-author">
             <a href="/authors/{{ rec.author }}">{{ rec.author }}</a>
             </div>
+            
 
-            <div id="book-isbn">
-            {{ rec.isbn }}
+            {% if rec.book_id in rec_excerpt_dict %}
+            <br>
+            <div id="book-excerpt">
+               First Line: {{ rec_excerpt_dict[rec.book_id] }} ...
             </div>
+            <br>
+            {% endif %}
 
             {% if rec.book_id in recommendation_info_dict %}
-                    <div id="book-genre">
-                        {% if 'categories' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"] %}
-                            <span id="genre">Genres:
-                                <ul id="genres">
-                                    {% for genre in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["categories"] %}
-                                        <li> {{ genre }} </li>
-                                    {% endfor %}
-                                 </ul>
-                             </span>
-                        {% endif %}
-                    </div>
-                
-                    
+                <br>
+                <div id="book-img">
+                    {% if 'thumbnail' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"] %}
+                        <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
+                        </span>
+                    {% endif %}
+                </div>
 
-                    <div id="book-img">
-                        {% if 'smallThumbnail' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"] %}
-                            <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["smallThumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <br>
-                    <div id="book-summary">
-                        {% if 'description' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"] %}
-                            <span id="summary"> Summary:
-                                <div>
-                                    <p>{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["description"] }}</p>
-                                </div>
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <div id = "book-library-link"><a href="{{ recommendation_link_dict[rec.book_id] }}">Find in your local library!</a>
-                    </div>     
+                <br>
+                <div id="book-summary">
+                    {% if 'description' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"] %}
+                        <span id="summary"> Summary:
+                            <p>{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["description"] }}</p>
+                        </span>
+                    {% endif %}
+                </div>
+                <br>
+                <div id="book-library-link"><a href="{{ recommendation_link_dict[rec.book_id] }}">Find in your local library!</a>
+                </div>
             {% endif %}
         </li>
     {% endfor %}
