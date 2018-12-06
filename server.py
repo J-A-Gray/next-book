@@ -167,11 +167,11 @@ def show_book_details(book_id):
             response_ol_json = response_ol.json()
             print(response_ol_json)
             isbnstring = "ISBN:{}".format(isbn13)
-            if isbnstring in response_ol_json:
-                if 'cover' in response_ol_json[isbnstring]:
+            if response_ol_json.get(isbnstring):
+                if response_ol_json[isbnstring].get('cover'):
                     cover_img = response_ol_json[isbnstring]["cover"]["medium"]
                 
-                if 'excerpts' in response_ol_json[isbnstring]:
+                if response_ol_json[isbnstring].get('excerpts'):
                     summary = response_ol_json[isbnstring]['excerpts'][0]['text']
                 for subject in response_ol_json[isbnstring]['subjects'][:3]:
                     genres.append(subject['name'])

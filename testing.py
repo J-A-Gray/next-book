@@ -1,7 +1,7 @@
 import unittest 
 
 from server import app
-from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id, create_authors_dict
+from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id, create_authors_dict, get_n_popular_books
 from model import *
 from outward import write_rating_data
 
@@ -278,6 +278,12 @@ class NextBookTestsDatabase(unittest.TestCase):
         author_dict=create_authors_dict()
         self.assertIn("Cecelia Ahern", author_dict.keys())
         self.assertIn('Death of Kings', author_dict['Bernard Cornwell'][0].title)
+
+    # def test_get_n_popular_books(self):
+    #     """Tests if a set of popular books is created."""
+    #     popular_books = get_n_popular_books(n=1)
+    #     for item in popular_books:
+    #         self.assertIsInstance(item, Book)
    
     def test_get_recommendations_lst(self):
         """Test if recommendations list is generated from the rated items of the closest neighbors"""

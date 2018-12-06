@@ -112,8 +112,20 @@ def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
                         neighbors_book_dict[book] = 1
 
     
-    print(neighbors_book_dict)
+    print("There are", len(neighbors_book_dict), "in the k-neighbors dictionary")
     return neighbors_book_dict
+
+def get_n_popular_books(n=15):
+
+    pass
+    
+#     books = Book.query.filter(count(Book.ratings)).limit_by(n).all()
+#     print(books)
+#     popular_books = set()
+
+#     return popular_books
+
+
 
 def get_recommendations_lst(neighbors_book_dict, num_neighbors=10, recs=5):
 
