@@ -147,6 +147,8 @@ def show_book_details(book_id):
     book_json = response.json()
 
     genres = []
+    summary = None
+    cover_img = None
     if book_json["totalItems"] >= 1: # pragma: no cover
         summary = book_json["items"][0]["volumeInfo"]["description"]
         cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
@@ -165,16 +167,15 @@ def show_book_details(book_id):
             response_ol_json = response_ol.json()
             print(response_ol_json)
             isbnstring = "ISBN:{}".format(isbn13)
-            cover_img = response_ol_json[isbnstring]["cover"]["medium"]
-            
-            summary = response_ol_json[isbnstring]['excerpts'][0]['text']
-            for subject in response_ol_json[isbnstring]['subjects'][:3]:
-                genres.append(subject['name'])
+            if isbnstring in response_ol_json:
+                if 'cover' in response_ol_json[isbnstring]:
+                    cover_img = response_ol_json[isbnstring]["cover"]["medium"]
+                
+                if 'excerpts' in response_ol_json[isbnstring]:
+                    summary = response_ol_json[isbnstring]['excerpts'][0]['text']
+                for subject in response_ol_json[isbnstring]['subjects'][:3]:
+                    genres.append(subject['name'])
     
-    else: # pragma: no cover
-        summary = None
-        cover_img = None
-        genres = None
 
     return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, response=response, summary=summary, cover_img=cover_img, genres=genres)
 
