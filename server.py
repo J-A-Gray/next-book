@@ -107,13 +107,13 @@ def user_detail(user_id):
     user = User.query.get(user_id)
     return render_template('user.html', user=user)
 
-@app.route('/books')
-def show_books():
-    """Show a book list."""
+# @app.route('/books')
+# def show_books():
+#     """Show a book list."""
 
-    books = Book.query.order_by('title').all()
+#     books = Book.query.order_by('title').all()
 
-    return render_template('book_list.html', books=books)
+#     return render_template('book_list.html', books=books)
 
 @app.route('/books/<int:book_id>', methods=['GET'])
 def show_book_details(book_id):
@@ -212,14 +212,14 @@ def set_rating(book_id):
     return redirect(f'/books/{book_id}')
 
 
-@app.route('/authors')
-def show_authors():
-    """Display a list of all authors and the books they've written from the database."""
+# @app.route('/authors')
+# def show_authors():
+#     """Display a list of all authors and the books they've written from the database."""
 
-    author_dict = create_authors_dict()
+#     author_dict = create_authors_dict()
 
 
-    return render_template('author_list.html', author_dict=author_dict)
+#     return render_template('author_list.html', author_dict=author_dict)
 
 
 @app.route('/authors/<author>', methods=['GET'])
