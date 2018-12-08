@@ -7,7 +7,7 @@ from surprise import get_dataset_dir
 
 def get_nearest_neighbors(user_id):
     #path to dataset file
-    file_path = os.path.expanduser('~/src/project/outward.csv')
+    file_path = os.path.expanduser('outward.csv')
 
     # define a reader object for our dataset
     reader = Reader(sep=',')
