@@ -1,17 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <div id="book-title">
-    <h1>{{ book.title }}</h1>
-  </div>
+  <header class="masthead" style="background-image: url('/static/something-to-read.jpg')">
+    <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="page-heading">
+              <h2>{{ book.title }}</h2>
+                
+            </div>
+            </div>
+          </div>
+        </div>
 
-  <div id="book-author">
-  <a href="/authors/{{ book.author }}">{{ book.author }}</a>
-</div>
+    </header>
 
-  <div id="book-isbn">
-  {{ book.isbn }}
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2 col-md-10 mx-auto">
+        {% if cover_img %}
+          <div id="book-img">
+            <span id ="cover-img">
+              <img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
+            </span>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div id="book-title">
+            <h1>{{ book.title }}</h1>
+          </div>
+
+          <div id="book-author">
+            <a href="/authors/{{ book.author }}">{{ book.author }}</a>
+          </div>
+        </div>
+      </div>
+
+      
 
  
 
@@ -25,12 +52,7 @@
     </div>
   {% endif %}
 
-  {% if cover_img %}
-    <div id="book-img">
-      <span id ="cover-img"><img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
-      </span>
-    </div>
-  {% endif %}
+
 
   {% if summary %}
     <br>
@@ -43,7 +65,10 @@
     </div>
   {% endif %}
 
-
+<div id="book-isbn">
+        {{ book.isbn }}
+      </div>
+    </div>
 
   
   {% if avg_rating != None %}
