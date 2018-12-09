@@ -19,9 +19,10 @@ from database_functions import add_anon_user, get_last_user_id, get_last_rating_
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 GBOOKS_key = os.environ.get("GBOOKS")
-app_secret_key = os.environ.get("APPSECRET_KEY")
+# app_secret_key = os.environ.get("APPSECRET_KEY")
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
@@ -413,14 +414,13 @@ def display_recommended_books():
 if __name__ == "__main__": # pragma: no cover
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
-    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-    app.debug = True
-    # make sure templates, etc. are not cached in debug mode
-    app.jinja_env.auto_reload = app.debug
-
+    # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+    # app.debug = True
+    # # make sure templates, etc. are not cached in debug mode
+    # app.jinja_env.auto_reload = app.debug
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')
