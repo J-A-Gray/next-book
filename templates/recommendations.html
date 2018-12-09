@@ -25,12 +25,18 @@
                     <div class="row">
                         <div class="col-lg-2 col-md-10 mx-auto">                     
                             {% if rec.book_id in recommendation_info_dict %}
-                                <div id="book-img">
-                                    {% if 'thumbnail' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"] %}
-                                        <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
-                                        </span>
+                                {% if "items" in recommendation_info_dict[rec.book_id] %}
+                                    {% if "volumeInfo" in recommendation_info_dict[rec.book_id]["items"][0] %}
+                                        {% if "imageLinks" in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"] %}
+                                            <div id="book-img">
+                                                {% if 'thumbnail' in recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"] %}
+                                                    <span id ="cover-img"><img src='{{ recommendation_info_dict[rec.book_id]["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"] }}' alt="Cover photo" id="cover-thumbnail">
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
-                              </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                         <div class="col-lg-8 col-md-10 mx-auto">
