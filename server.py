@@ -1,4 +1,4 @@
-"""Movie Ratings."""
+"""Book Recommendations"""
 
 from jinja2 import StrictUndefined
 
