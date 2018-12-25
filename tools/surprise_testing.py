@@ -14,7 +14,6 @@ reader = Reader(sep=',')
 #load data from dataset
 data = Dataset.load_from_file(file_path, reader=reader)
 
-# Use the famous SVD algorithm.
 # sim_options = {'name': 'pearson_baseline', 'user_based': True}
 algo = NMF()
 

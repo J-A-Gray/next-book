@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import os
 import requests
 import urllib3
+from werkzeug.security import generate_password_hash, check_password_hash
 from pyisbn import convert as convert_isbn
 
 
@@ -58,6 +59,8 @@ def register_for_site():
 
     else:
         next_id = get_last_user_id() + 1
+        password = generate_password_hash(password)
+        print(password)
         new_user = User(user_id=next_id, email=email, password=password)
 
         db.session.add(new_user)
@@ -84,15 +87,19 @@ def login_process():
         flash("You are not yet registered!")
         return redirect('/register')
 
-    if user.password != password:
+    if not check_password_hash(user.password, password):
         flash("That's not the right password. Try again?")
         return redirect('/login')
 
-    else:
+    if user and check_password_hash(user.password, password):
         session['user_id'] = user.user_id
+        return redirect(f'/users/{user.user_id}')
 
-    flash('Welcome!')
-    return redirect(f'/users/{user.user_id}')
+    else:
+        flash("Try Again")
+        return redirect('/login')
+
+
 
 @app.route('/logout')
 def logout():
