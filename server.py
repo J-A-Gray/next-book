@@ -16,7 +16,7 @@ from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
 from ml import get_nearest_neighbors
 from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict
-from utils import convert_row_to_dict
+from utils import convert_row_to_dict, get_info_google_books, get_info_open_library
 
 
 app = Flask(__name__)
@@ -131,7 +131,7 @@ def get_info_by_book_id(book_id):
         book_by_book_id = get_book_by_book_id(book_id)
 
         book_dict = convert_row_to_dict(book_by_book_id)
-        print(book_dict)
+
         return jsonify(book_dict)
 
         # book_by_book_id_serialized = Book.serialize(book_by_book_id)
@@ -168,46 +168,22 @@ def show_book_details(book_id):
         avg_rating = None
 
     #get summary, genres and cover image from Google Books
-    url = "https://www.googleapis.com/books/v1/volumes"
-    payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
+    open_lib_info = get_info_open_library(book)
+    book_info_dict = get_info_google_books(book, GBOOKS_key)
+
+    genres = open_lib_info['genres']
+    excerpts = open_lib_info['excerpts']
+    summary = book_info_dict['summary']
+    cover_img = open_lib_info['cover_img']
+    book_json = open_lib_info['response']
+
+    if not genres:
+        genres = book_info_dict['genres']
+    if not cover_img:
+        cover_img = book_info_dict['cover_img']
 
 
-    response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-    # print(response.url)
-    book_json = response.json()
-
-    genres = []
-    summary = None
-    cover_img = None
-    if book_json["totalItems"] >= 1: # pragma: no cover
-        summary = book_json["items"][0]["volumeInfo"]["description"]
-        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
-        genres = book_json["items"][0]["volumeInfo"]["categories"]
-
-    elif book_json["totalItems"] < 1: # pragma: no cover
-        #library.link requires isbn-13, so convert book.isbn to isbn-13
-        isbn13 = convert_isbn(book.isbn)
-
-        #use isbn-13 to get url for nearby library search
-        open_library_url = "https://openlibrary.org/api/books"
-        payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
-
-        response_ol = requests.get(open_library_url, params=payload)
-        if response_ol:
-            response_ol_json = response_ol.json()
-            print(response_ol_json)
-            isbnstring = "ISBN:{}".format(isbn13)
-            if response_ol_json.get(isbnstring):
-                if response_ol_json[isbnstring].get('cover'):
-                    cover_img = response_ol_json[isbnstring]["cover"]["medium"]
-                
-                if response_ol_json[isbnstring].get('excerpts'):
-                    summary = response_ol_json[isbnstring]['excerpts'][0]['text']
-                for subject in response_ol_json[isbnstring]['subjects'][:3]:
-                    genres.append(subject['name'])
-    
-
-    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, response=response, summary=summary, cover_img=cover_img, genres=genres)
+    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, summary=summary, cover_img=cover_img, genres=genres)
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):
