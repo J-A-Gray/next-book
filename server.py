@@ -7,6 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import os
 import requests
 import urllib3
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from pyisbn import convert as convert_isbn
 
@@ -14,9 +15,8 @@ from pyisbn import convert as convert_isbn
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
 from ml import get_nearest_neighbors
-
-
 from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict
+from utils import convert_row_to_dict
 
 
 app = Flask(__name__)
@@ -122,6 +122,28 @@ def user_detail(user_id):
 #     books = Book.query.order_by('title').all()
 
 #     return render_template('book_list.html', books=books)
+
+@app.route('/books/<int:book_id>/info.json')
+def get_info_by_book_id(book_id):
+
+    if book_id:
+
+        book_by_book_id = get_book_by_book_id(book_id)
+
+        book_dict = convert_row_to_dict(book_by_book_id)
+        print(book_dict)
+        return jsonify(book_dict)
+
+        # book_by_book_id_serialized = Book.serialize(book_by_book_id)
+
+
+        # return jsonify(book_by_book_id_serialized)
+
+        # return jsonify({"books": books_by_title})
+
+    else:
+        return "No books found."
+
 
 @app.route('/books/<int:book_id>', methods=['GET'])
 def show_book_details(book_id):
