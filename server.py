@@ -128,9 +128,27 @@ def get_info_by_book_id(book_id):
 
     if book_id:
 
-        book_by_book_id = get_book_by_book_id(book_id)
+        book = get_book_by_book_id(book_id)
 
-        book_dict = convert_row_to_dict(book_by_book_id)
+        book_dict = convert_row_to_dict(book)
+
+        #get info from Open Library
+        open_lib_info = get_info_open_library(book)
+
+        #get book info from Google Books
+        google_books_info = get_info_google_books(book, GBOOKS_key)
+
+        book_dict["genres"] = open_lib_info['genres']
+        book_dict["excerpts"] = open_lib_info['excerpts']
+        book_dict["summary"] = google_books_info['summary']
+        book_dict["cover_img"] = open_lib_info['cover_img']
+        book_dict["book_json"] = open_lib_info['response']
+
+        if not book_dict["genres"]:
+            book_dict["genres"] = google_books_info['genres']
+        if not book_dict["cover_img"]:
+            book_dict["cover_img"] = google_books_info['cover_img']
+
 
         return jsonify(book_dict)
 
@@ -167,23 +185,25 @@ def show_book_details(book_id):
     else:
         avg_rating = None
 
-    #get summary, genres and cover image from Google Books
+    #get book info from Open Library
     open_lib_info = get_info_open_library(book)
-    book_info_dict = get_info_google_books(book, GBOOKS_key)
+
+    #get book info from Google Books
+    google_books_info = get_info_google_books(book, GBOOKS_key)
 
     genres = open_lib_info['genres']
     excerpts = open_lib_info['excerpts']
-    summary = book_info_dict['summary']
+    summary = google_books_info['summary']
     cover_img = open_lib_info['cover_img']
     book_json = open_lib_info['response']
 
     if not genres:
-        genres = book_info_dict['genres']
+        genres = google_books_info['genres']
     if not cover_img:
-        cover_img = book_info_dict['cover_img']
+        cover_img = google_books_info['cover_img']
 
 
-    return render_template('book.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, summary=summary, cover_img=cover_img, genres=genres)
+    return render_template('book-react.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, summary=summary, cover_img=cover_img, genres=genres)
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):
@@ -415,6 +435,8 @@ def display_recommended_books():
 
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict, rec_excerpt_dict=rec_excerpt_dict)
+
+
 
 if __name__ == "__main__": # pragma: no cover
     # We have to set debug=True here, since it has to be True at the

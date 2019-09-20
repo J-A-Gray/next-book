@@ -54,14 +54,18 @@ def get_info_open_library(book):
 
         isbnstring = "ISBN:{}".format(isbn13)
         if book_json.get(isbnstring):
-            if book_json[isbnstring].get('cover'):
-                book_info_dict["cover_img"] = book_json[isbnstring]["cover"]["medium"]
-            
-            if book_json[isbnstring].get('excerpts'):
-                book_info_dict["excerpts"] = book_json[isbnstring]['excerpts'][0]['text']
-            
-            for subject in book_json[isbnstring]['subjects'][:3]:
-                book_info_dict["genres"].append(subject['name'])
+            try:
+                if book_json[isbnstring].get('cover'):
+                    book_info_dict["cover_img"] = book_json[isbnstring]["cover"]["medium"]
+                
+                if book_json[isbnstring].get('excerpts'):
+                    book_info_dict["excerpts"] = book_json[isbnstring]['excerpts'][0]['text']
+                
+                for subject in book_json[isbnstring]['subjects'][:3]:
+                    book_info_dict["genres"].append(subject['name'])
+
+            except KeyError:
+                print("Open Library data not as expected")
 
 
     return book_info_dict
