@@ -48,7 +48,8 @@ def get_info_open_library(book):
                           "summary": None,
                           "excerpts": None,
                           "cover_img": None,
-                          "response": book_json}
+                          "response": book_json,
+                          "previewURL": None}
 
         print(book_json)
 
@@ -63,6 +64,11 @@ def get_info_open_library(book):
                 
                 for subject in book_json[isbnstring]['subjects'][:3]:
                     book_info_dict["genres"].append(subject['name'])
+
+                if book_json[isbnstring].get('ebooks'):
+                    if book_json[isbnstring]['ebooks'][0].get('preview_url'):
+                        book_info_dict["previewURL"] = book_json[isbnstring]['ebooks'][0]['preview_url']
+                        print("PREVIEW URL IS", book_info_dict["previewURL"])
 
             except KeyError:
                 print("Open Library data not as expected")

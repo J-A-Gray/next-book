@@ -129,6 +129,7 @@ def get_info_by_book_id(book_id):
     if book_id:
 
         book = get_book_by_book_id(book_id)
+        print(book.author)
 
         book_dict = convert_row_to_dict(book)
 
@@ -142,7 +143,10 @@ def get_info_by_book_id(book_id):
         book_dict["excerpts"] = open_lib_info['excerpts']
         book_dict["summary"] = google_books_info['summary']
         book_dict["cover_img"] = open_lib_info['cover_img']
-        book_dict["book_json"] = open_lib_info['response']
+        # book_dict["book_json"] = open_lib_info['response']
+        book_dict["previewURL"] = open_lib_info['previewURL']
+        book_dict["authorLink"] = "/authors/" + book.author
+        print(book_dict)
 
         if not book_dict["genres"]:
             book_dict["genres"] = google_books_info['genres']

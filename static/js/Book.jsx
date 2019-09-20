@@ -1,4 +1,3 @@
-
 class Book extends React.Component {
     constructor() {
     super()
@@ -22,13 +21,19 @@ class Book extends React.Component {
 
     render() {
         const bookData = this.state.attributes
+        
         if (this.state.isLoaded) {
             return (
                 <div>
                     <img src={this.state.attributes.cover_img} />
                     <h1>{this.state.attributes.title}</h1>
-                    <h2>{this.state.attributes.author}</h2>
+                    <div id="book-author">
+                        <a href = {this.state.attributes.authorLink}>
+                        <h2>{this.state.attributes.author}</h2>
+                        </a>
+                    </div>
                     <p>{this.state.attributes.summary}</p>
+                    <a href={this.state.attributes.previewURL}>Preview Me!</a>
                 </div>)
         } else {
 
