@@ -20,8 +20,7 @@ class Book extends React.Component {
     }
 
     render() {
-        const bookData = this.state.attributes
-        
+
         if (this.state.isLoaded) {
             return (
                 <div>
@@ -32,8 +31,11 @@ class Book extends React.Component {
                         <h2>{this.state.attributes.author}</h2>
                         </a>
                     </div>
-                    <p>{this.state.attributes.summary}</p>
+                    <p className='summary'>{this.state.attributes.summary}</p>
                     <a href={this.state.attributes.previewURL}>Preview Me!</a>
+                    <p className="first-line">{this.state.attributes.excerpts}</p>
+    
+                        <p>Average Rating: {this.state.attributes.avgRating}</p>  
                 </div>)
         } else {
 

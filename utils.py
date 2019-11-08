@@ -75,3 +75,27 @@ def get_info_open_library(book):
 
 
     return book_info_dict
+
+def create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book):
+
+        book_dict["genres"] = open_lib_info['genres']
+        book_dict["excerpts"] = open_lib_info['excerpts']
+        book_dict["summary"] = google_books_info['summary']
+        book_dict["cover_img"] = open_lib_info['cover_img']
+        # book_dict["book_json"] = open_lib_info['response']
+        book_dict["previewURL"] = open_lib_info['previewURL']
+        book_dict["authorLink"] = "/authors/" + book.author
+        print(book_dict)
+
+        if not book_dict["genres"]:
+            book_dict["genres"] = google_books_info['genres']
+        if not book_dict["cover_img"]:
+            book_dict["cover_img"] = google_books_info['cover_img']
+
+        book_dict["avgRating"] = avg_rating
+
+        return book_dict
+
+
+
+

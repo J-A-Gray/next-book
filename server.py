@@ -16,7 +16,7 @@ from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
 from ml import get_nearest_neighbors
 from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict
-from utils import convert_row_to_dict, get_info_google_books, get_info_open_library
+from utils import convert_row_to_dict, get_info_google_books, get_info_open_library, create_combined_book_info_dict
 
 
 app = Flask(__name__)
@@ -60,11 +60,10 @@ def register_for_site():
     else:
         next_id = get_last_user_id() + 1
         password = generate_password_hash(password)
-        print(password)
         new_user = User(user_id=next_id, email=email, password=password)
 
         db.session.add(new_user)
-    db.session.commit()
+        db.session.commit()
 
     return redirect('/login')
 
@@ -87,11 +86,11 @@ def login_process():
         flash("You are not yet registered!")
         return redirect('/register')
 
-    if not check_password_hash(user.password, password):
+    elif not check_password_hash(user.password, password):
         flash("That's not the right password. Try again?")
         return redirect('/login')
 
-    if user and check_password_hash(user.password, password):
+    elif user and check_password_hash(user.password, password):
         session['user_id'] = user.user_id
         return redirect(f'/users/{user.user_id}')
 
@@ -129,7 +128,6 @@ def get_info_by_book_id(book_id):
     if book_id:
 
         book = get_book_by_book_id(book_id)
-        print(book.author)
 
         book_dict = convert_row_to_dict(book)
 
@@ -139,29 +137,17 @@ def get_info_by_book_id(book_id):
         #get book info from Google Books
         google_books_info = get_info_google_books(book, GBOOKS_key)
 
-        book_dict["genres"] = open_lib_info['genres']
-        book_dict["excerpts"] = open_lib_info['excerpts']
-        book_dict["summary"] = google_books_info['summary']
-        book_dict["cover_img"] = open_lib_info['cover_img']
-        # book_dict["book_json"] = open_lib_info['response']
-        book_dict["previewURL"] = open_lib_info['previewURL']
-        book_dict["authorLink"] = "/authors/" + book.author
-        print(book_dict)
 
-        if not book_dict["genres"]:
-            book_dict["genres"] = google_books_info['genres']
-        if not book_dict["cover_img"]:
-            book_dict["cover_img"] = google_books_info['cover_img']
+        rating_scores = [r.score for r in book.ratings]
+        if len(rating_scores) > 0:
+            avg_rating = float(sum(rating_scores))/len(rating_scores)
+            avg_rating = f"{avg_rating:.1f}"
+        else:
+            avg_rating = None
 
+        book_dict = create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book)
 
         return jsonify(book_dict)
-
-        # book_by_book_id_serialized = Book.serialize(book_by_book_id)
-
-
-        # return jsonify(book_by_book_id_serialized)
-
-        # return jsonify({"books": books_by_title})
 
     else:
         return "No books found."
@@ -170,44 +156,7 @@ def get_info_by_book_id(book_id):
 @app.route('/books/<int:book_id>', methods=['GET'])
 def show_book_details(book_id):
 
-    book = Book.query.get(book_id)
-
-    user_id = session.get('user_id')
-
-    if user_id:
-        #get user rating
-        user_rating = Rating.query.filter_by(book_id=book_id, user_id=user_id).first()
-    else:
-        user_rating = None
-
-    #Get avg rating of book
-
-    rating_scores = [r.score for r in book.ratings]
-    if len(rating_scores) > 0:
-        avg_rating = float(sum(rating_scores))/len(rating_scores)
-        avg_rating = f"{avg_rating:.1f}" 
-    else:
-        avg_rating = None
-
-    #get book info from Open Library
-    open_lib_info = get_info_open_library(book)
-
-    #get book info from Google Books
-    google_books_info = get_info_google_books(book, GBOOKS_key)
-
-    genres = open_lib_info['genres']
-    excerpts = open_lib_info['excerpts']
-    summary = google_books_info['summary']
-    cover_img = open_lib_info['cover_img']
-    book_json = open_lib_info['response']
-
-    if not genres:
-        genres = google_books_info['genres']
-    if not cover_img:
-        cover_img = google_books_info['cover_img']
-
-
-    return render_template('book-react.html', book=book, user_rating=user_rating, user_id=user_id, avg_rating=avg_rating, summary=summary, cover_img=cover_img, genres=genres)
+    return render_template('book-react.html')
 
 @app.route('/books/<int:book_id>', methods=['POST'])
 def set_rating(book_id):
