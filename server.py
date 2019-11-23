@@ -39,6 +39,7 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Homepage."""
+
     return render_template("homepage.html")
 
 @app.route('/register', methods=['GET'])
@@ -175,7 +176,6 @@ def set_rating(book_id):
         flash("You've updated your rating!")
         db.session.add(user_rating)
         print(user_rating)
-        db.session.commit()
 
     
     else:# if the rating object does not exist yet
@@ -186,7 +186,7 @@ def set_rating(book_id):
         db.session.add(user_rating)
         print(user_rating)
 
-        db.session.commit()
+    db.session.commit()
 
     return redirect(f'/books/{book_id}')
 
