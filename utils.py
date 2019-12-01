@@ -22,7 +22,7 @@ def get_info_google_books(book, GBOOKS_key):
                       "cover_img": None,
                       "response": book_json}
     
-    if book_json["totalItems"] >= 1:
+    if book_json.get("totalItems", 0) >= 1:
         try:
             book_info_dict["summary"] = book_json["items"][0]["volumeInfo"]["description"]
             book_info_dict["cover_img"] = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]

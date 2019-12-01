@@ -86,67 +86,51 @@ def load_ratings():
 
     Rating.query.delete()
 
-    with open('seed_data/splitfile_1.csv', encoding='utf-16') as csvfile:
-        try:
-            dialect = csv.Sniffer().sniff(csvfile.read(1024))
-        except:
-            dialect = 'excel'
+    filename_prefix = 'seed_data/splitfile_'
+    filename_num = '1'
+    filename_suffix = '.csv'
 
-        csvfile.seek(0)
-        reader = csv.reader(csvfile, dialect)
-        next(csvfile) #skips first row of the csv file
-        for row in reader:
-            book_id = row[1]
-            user_id = row[0]
-            score = row[2]
-                
-            user_id = int(user_id)
-            book_id = int(book_id)
-            score = int(score)
+    while int(filename_num) <= 2:
+        filename = filename_prefix + filename_num + filename_suffix
 
-            rating = Rating(user_id=user_id,
-                            book_id=book_id,
-                            score=score)
+        with open(filename, encoding='utf-16') as csvfile:
+            try:
+                dialect = csv.Sniffer().sniff(csvfile.read(1024))
+            except:
+                dialect = 'excel'
 
-            #We need to add to the session or it won't ever be stored
+            csvfile.seek(0)
+            reader = csv.reader(csvfile, dialect)
+            next(csvfile) #skips first row of the csv file
 
-            book_in_db = Book.query.get(book_id)
-            user_in_db = User.query.get(user_id)
-            if book_in_db and user_in_db:
-                db.session.add(rating)
-                print("Rating for " + str(rating.book_id) + " added to database")
+            counter = 0
+            for row in reader:
+                book_id = row[1]
+                user_id = row[0]
+                score = row[2]
+                    
+                user_id = int(user_id)
+                book_id = int(book_id)
+                score = int(score)
 
-    with open('seed_data/splitfile_2.csv', encoding='utf-16') as csvfile:
-        try:
-            dialect = csv.Sniffer().sniff(csvfile.read(1024))
-        except:
-            dialect = 'excel'
+                rating = Rating(user_id=user_id,
+                                book_id=book_id,
+                                score=score)
 
-        csvfile.seek(0)
-        reader = csv.reader(csvfile, dialect)
-        next(csvfile) #skips first row of the csv file
-        for row in reader:
-            book_id = row[1]
-            user_id = row[0]
-            score = row[2]
-                
-            user_id = int(user_id)
-            book_id = int(book_id)
-            score = int(score)
+                #We need to add to the session or it won't ever be stored
 
-            rating = Rating(user_id=user_id,
-                            book_id=book_id,
-                            score=score)
+                book_in_db = Book.query.get(book_id)
+                user_in_db = User.query.get(user_id)
+                if book_in_db and user_in_db:
+                    db.session.add(rating)
+                    print("Rating for " + str(rating.book_id) + " added to database")
+                    counter += 1
 
-            #We need to add to the session or it won't ever be stored
-
-            book_in_db = Book.query.get(book_id)
-            user_in_db = User.query.get(user_id)
-            if book_in_db and user_in_db:
-                db.session.add(rating)
-                print("Rating for " + str(rating.book_id) + " added to database")
-            
-        db.session.commit()
+                if counter > 999 and counter % 1000 == 0:
+                    print("Commiting new objects")
+                    db.session.commit()
+                    
+            db.session.commit()
 
 
 

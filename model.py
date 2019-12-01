@@ -126,11 +126,15 @@ def example_data():
     rating8 = Rating(rating_id=8, book_id=8387, user_id=3, score=3)
     rating9 = Rating(rating_id=9, book_id=8387, user_id=4, score=3)
     rating10 = Rating(rating_id=10, book_id=8387, user_id=5, score=1)
+    rating11 = Rating(rating_id=11, book_id=69, user_id=5, score=5)
+    rating12 = Rating(rating_id=12, book_id=3327, user_id=5, score=5)
+    rating13 = Rating(rating_id=13, book_id=3327, user_id=2, score=5)
 
     #Add all to session and commit
     db.session.add_all([user1, user2, user3, user4, user5, book1, book2, book3, 
                         book4, book5, rating1, rating2, rating3, rating4, 
-                        rating5, rating6, rating7, rating8, rating9, rating10])
+                        rating5, rating6, rating7, rating8, rating9, rating10, rating11,
+                        rating12, rating13])
     db.session.commit()
 
 def connect_to_db(app, db_uri='postgresql:///nextbook'):

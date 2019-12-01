@@ -15,7 +15,7 @@ from pyisbn import convert as convert_isbn
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
 from ml import get_nearest_neighbors
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_list, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict
+from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_set, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict, get_n_popular_books
 from utils import convert_row_to_dict, get_info_google_books, get_info_open_library, create_combined_book_info_dict
 
 
@@ -125,6 +125,36 @@ def user_detail(user_id):
 
 @app.route('/books/<int:book_id>/info.json')
 def get_info_by_book_id(book_id):
+
+    if book_id:
+
+        book = get_book_by_book_id(book_id)
+
+        book_dict = convert_row_to_dict(book)
+
+        #get info from Open Library
+        open_lib_info = get_info_open_library(book)
+
+        #get book info from Google Books
+        google_books_info = get_info_google_books(book, GBOOKS_key)
+
+
+        rating_scores = [r.score for r in book.ratings]
+        if len(rating_scores) > 0:
+            avg_rating = float(sum(rating_scores))/len(rating_scores)
+            avg_rating = f"{avg_rating:.1f}"
+        else:
+            avg_rating = None
+
+        book_dict = create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book)
+
+        return jsonify(book_dict)
+
+    else:
+        return "No books found."
+
+@app.route('/api/books/<int:book_id>')
+def serve_info_by_book_id(book_id):
 
     if book_id:
 
@@ -285,8 +315,6 @@ def search_books_by_author(): # pragma: no cover
 
         return jsonify(books_by_author_serialized)
 
-        # return jsonify({"books": books_by_title})
-
     else:
         return "No books found."
 
@@ -309,6 +337,22 @@ def search_books_by_book_id(): # pragma: no cover
     else:
         return "No books found."
 
+@app.route('/api/popular') 
+def get_top_books_info():
+
+    popular_books = get_n_popular_books(n=20)
+ 
+
+    books_serialized = Book.serialize_list(popular_books)
+    for book in books_serialized:
+       del book['ratings']
+
+    return jsonify(books_serialized)
+
+@app.route('/popular')
+def display_top_books():
+
+    return render_template('top_books.html')
 
 
 @app.route('/recommendations', methods=['GET'])
@@ -318,7 +362,7 @@ def display_recommended_books():
     neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
     
     #from database_functions.py
-    user_book_lst = create_user_list(int(user_id))
+    user_book_lst = create_user_set(int(user_id))
     neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
     recommendation_lst = get_recommendations_lst(neighbors_dict)
     print(recommendation_lst)

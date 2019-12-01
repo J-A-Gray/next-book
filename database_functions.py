@@ -1,4 +1,5 @@
 from model import *
+from sqlalchemy import func
 
 
 
@@ -80,51 +81,63 @@ def create_authors_dict():
     return author_dict
 
 
-def create_user_list(user_id):
+def create_user_set(user_id):
     """Create a list of books rated by the user"""
-    user_book_lst=[]
+    user_book_set = set()
     ratings = Rating.query.filter_by(user_id=user_id).all()
     
     for rating in ratings:
-        book_id = rating.book_id
-        book = Book.query.filter(Book.book_id==book_id).first()
-        user_book_lst.append(book)
+        user_book_set.add(rating.book)
 
-    return user_book_lst
+    return user_book_set
 
-def create_neighbors_book_dict(neighbors_user_id_lst, user_book_lst, score):
+def create_neighbors_book_dict(neighbors_user_id_lst, user_book_set, score):
     """Create a dictionary of Book objects rated by neighbors of user but not in users input"""
 
     neighbors_book_dict = {}
+
+    #for each user in most similar user list
     for neighbor in neighbors_user_id_lst:
         user = User.query.get(int(neighbor))
 
         ratings = Rating.query.filter_by(user_id=user.user_id).all()
 
+        books_by_score = set()
+
+        #add books from neighbors with same score to a set
         for rating in ratings:
             if rating.score == score:
-                book_id = rating.book_id
-                book = Book.query.filter(Book.book_id==book_id).first()
-                if book not in user_book_lst:
-                    if neighbors_book_dict.get(book):
-                        neighbors_book_dict[book] += 1
-                    else:
-                        neighbors_book_dict[book] = 1
+                books_by_score.add(rating.book)
+
+        #all the books the current user hasn't rated with the same rating as given
+        neighbor_books = books_by_score - user_book_set
+
+
+        for book in neighbor_books:
+            if neighbors_book_dict.get(book):
+                neighbors_book_dict[book] += 1
+            else:
+                neighbors_book_dict[book] = 1
 
     
-    print("There are", len(neighbors_book_dict), "in the k-neighbors dictionary")
+    print("There are", len(neighbors_book_dict), "books in the k-neighbors dictionary")
+
     return neighbors_book_dict
 
+
 def get_n_popular_books(n=15):
+    """Return a list of the n-most highly rated books."""
 
-    pass
-    
-#     books = Book.query.filter(count(Book.ratings)).limit_by(n).all()
-#     print(books)
-#     popular_books = set()
+    books_by_rating = (db.session.query(func.count(Rating.score), Book)
+        .join(Book)
+        .filter(Rating.score == 5)
+        .group_by(Book)
+        .order_by(func.count(Rating.score).desc())
+        .limit(n)
+        .all())
 
-#     return popular_books
 
+    return [book_tuple[1] for book_tuple in books_by_rating]
 
 
 def get_recommendations_lst(neighbors_book_dict, num_neighbors=10, recs=5):
