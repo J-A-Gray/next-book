@@ -4,6 +4,7 @@ from server import app
 from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_set, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id, create_authors_dict, get_n_popular_books
 from model import *
 from outward import write_rating_data
+import json
 
 class NextBookTests(unittest.TestCase):
     """Test NextBook site"""
@@ -122,18 +123,25 @@ class NextBookTestsDatabase(unittest.TestCase):
         result = self.client.get('/search-by-author.json', 
                                     query_string={'author' : 'Henning Mankell'},
                                     content_type='application/json')
-       
+
+        json_data = json.loads(result.get_data(as_text=True))
+        
+
         self.assertEqual(result.status_code, 200)
         self.assertIn(b"The White Lioness", result.data)
+        self.assertEqual(json_data[0]['book_id'], 8387)
 
     def test_search_by_title(self):
         """Test if search by author route returns valid JSON response."""
         result = self.client.get('/search-by-title.json', 
                                     query_string={'title' : 'White Lioness'},
                                     content_type='application/json')
+
+        json_data = json.loads(result.get_data(as_text=True))
        
         self.assertEqual(result.status_code, 200)
         self.assertIn(b"Henning Mankell", result.data)
+        self.assertEqual(json_data[0]['book_id'], 8387)
 
     def test_register_process(self):
         """Test if new user can register"""
@@ -297,7 +305,7 @@ class NextBookTestsDatabase(unittest.TestCase):
 
     def test_get_n_popular_books(self):
         """Tests if a set of popular books is created."""
-        n = 5
+        n = 3
         popular_books = get_n_popular_books(n)
 
         for item in popular_books:
