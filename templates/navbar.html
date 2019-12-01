@@ -1,0 +1,79 @@
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Nextbook</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+        <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/search">Get Recommendations</a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="/authors">Authors</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/books">Books</a>
+            </li> -->
+          </ul>
+            {% if 'user_id' not in session %}
+              <ul class="navbar-nav navbar-right ml-auto">
+                <li class="dropdown nav-item">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Login<span class="caret"></span></a>
+                <ul id="login-dp" class="dropdown-menu dropdown-menu-right">
+                    <li>
+                         <div class="row">
+                                <div class="col-md-12">
+                                    <form class="form" role="form" method="post" action="/login" accept-charset="UTF-8" id="login-nav">
+                                        <div class="form-group">
+                                            <label class="sr-only">Email address</label>
+                                            <input type="email" 
+                                                   class="form-control" 
+                                                   name="email" 
+                                                   placeholder="Email"
+                                                   autocomplete="username" 
+                                                   required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="sr-only">Password</label>
+                                            <input type="password" 
+                                                   class="form-control"
+                                                   name="password"  
+                                                   placeholder="Password" required
+                                                   autocomplete="current-password">
+                                            <div class="help-block text-right"><a href="">Forgot your password?</a></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                <input type="checkbox"> Remember me!
+                                                </label>
+                                            </div>
+                                    </form>
+                                </div>
+                                <div class="bottom text-center">
+                                     <a href="/register"><b>Create an account to get even better recommendations</b></a>
+                                </div>
+                         </div>
+                    </li>
+                </ul>
+        {% else %}
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <div class="login-container form-group">
+                        <form action="/logout">
+                            <button type="submit" class="btn btn-primary">Logout</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        {% endif %}
+        </div>
+      </div>
+    </nav>

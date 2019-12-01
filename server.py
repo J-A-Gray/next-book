@@ -221,14 +221,14 @@ def set_rating(book_id):
     return redirect(f'/books/{book_id}')
 
 
-# @app.route('/authors')
-# def show_authors():
-#     """Display a list of all authors and the books they've written from the database."""
+@app.route('/authors')
+def show_authors():
+    """Display a list of all authors and the books they've written from the database."""
 
-#     author_dict = create_authors_dict()
+    author_dict = create_authors_dict()
 
 
-#     return render_template('author_list.html', author_dict=author_dict)
+    return render_template('author_list.html', author_dict=author_dict)
 
 
 @app.route('/authors/<author>', methods=['GET'])

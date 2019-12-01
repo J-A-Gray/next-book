@@ -1,17 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 
- <div id="author-name">
-    <h1>{{ author }}</h1>
-  </div>
+<main>
+    <div id="author-name">
+        <h1>{{ author }}</h1>
+    </div>
 
-  <div id="author-bio">
-  </div>
+    <div id="author-bio">
+    </div>
 
-  <div id="author-books">
-    {% for book in book_lst %}
-        <a href="/books/{{ book.book_id }}">{{ book.title }}</a>
-        <br>
-    {% endfor %}
-</div>
+    <div id="author-books">
+        {% for book in book_lst %}
+            <a href="/books/{{ book.book_id }}">{{ book.title }}</a>
+            <br>
+        {% endfor %}
+    </div>
+</main>
+
 {% endblock %}

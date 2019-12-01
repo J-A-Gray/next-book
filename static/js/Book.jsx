@@ -45,8 +45,9 @@ class Book extends React.Component {
                             (<a href={this.state.attributes.previewURL}>Preview Me!</a>)}
 
                     <p className="first-line">{this.state.attributes.excerpts}</p>
-    
-                    <p>Average Rating: {this.state.attributes.avgRating}</p>  
+                    {this.state.attributes.avgRating && 
+                        (<p>Average Rating: {this.state.attributes.avgRating}</p>)}
+                      
                 </div>)
         } else {
 

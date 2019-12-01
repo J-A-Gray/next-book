@@ -91,6 +91,7 @@ def load_ratings():
     filename_suffix = '.csv'
 
     while filename_num <= 2:
+        print("Starting file #", filename_num)
         filename = filename_prefix + str(filename_num) + filename_suffix
 
         with open(filename, encoding='utf-16') as csvfile:
@@ -134,8 +135,9 @@ def load_ratings():
                     how_many +=1
                     
             db.session.commit()
+            print("Finished with file #" + filename_num)
             filename_num += 1
-            print("Starting file #", filename_num)
+           
 
 
 

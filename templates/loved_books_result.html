@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<main>
 <h2>I think you might like:</h2>
 <ul>
     {% for rec in recommendation_lst %}
@@ -8,5 +10,5 @@
         </li>
     {% endfor %}
 </ul>
-
+</main>
 {% endblock %}
