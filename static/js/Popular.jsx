@@ -66,8 +66,17 @@ class Book extends React.Component {
             return (
                 (
                     <div>
-                        <img src={this.state.attributes.cover_img} />
-                        <h1>{this.props.book.title}</h1>
+                        {this.state.attributes.cover_img && (
+                            <div>
+                                <img src={this.state.attributes.cover_img}></img>
+                            </div>)}
+                    
+                        <div>
+                            <a href = {this.state.attributes.titleLink}>
+                            <h1>{this.props.book.title}</h1>
+                            </a>
+                        </div>
+                        
                         <div id="book-author">
                             <a href = {this.state.attributes.authorLink}>
                                 <h2>{this.props.book.author}</h2>
@@ -75,8 +84,11 @@ class Book extends React.Component {
                         </div>
     
                         <br />
-                        <p className='summary'>{this.state.attributes.summary}</p>
-                        <a href={this.state.attributes.previewURL}>Preview Me!</a>
+                        {this.state.attributes.summary && 
+                            (<p className='summary'>{this.state.attributes.summary}</p>)}
+                        {this.state.attributes.previewURL && 
+                            (<a href={this.state.attributes.previewURL}>Preview Me!</a>)}
+
                         <p className="first-line">{this.state.attributes.excerpts}</p>
     
                         <p>Average Rating: {this.state.attributes.avgRating}</p>

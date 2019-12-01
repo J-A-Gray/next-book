@@ -85,6 +85,7 @@ def create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, 
         # book_dict["book_json"] = open_lib_info['response']
         book_dict["previewURL"] = open_lib_info['previewURL']
         book_dict["authorLink"] = "/authors/" + book.author
+        book_dict['titleLink'] = '/books/' + str(book.book_id)
         print(book_dict)
 
         if not book_dict["genres"]:

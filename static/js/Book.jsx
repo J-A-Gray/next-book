@@ -22,20 +22,31 @@ class Book extends React.Component {
     render() {
 
         if (this.state.isLoaded) {
+            console.log(this.state.attributes)
             return (
                 <div>
                     <img src={this.state.attributes.cover_img} />
-                    <h1>{this.state.attributes.title}</h1>
+
+                    <div>
+                        <a href = {this.state.attributes.titleLink}>
+                            <h1>{this.state.attributes.title}</h1>
+                        </a>
+                    </div>
+
                     <div id="book-author">
                         <a href = {this.state.attributes.authorLink}>
                         <h2>{this.state.attributes.author}</h2>
                         </a>
                     </div>
-                    <p className='summary'>{this.state.attributes.summary}</p>
-                    <a href={this.state.attributes.previewURL}>Preview Me!</a>
+
+                    {this.state.attributes.summary && 
+                            (<p className='summary'>{this.state.attributes.summary}</p>)}
+                    {this.state.attributes.previewURL && 
+                            (<a href={this.state.attributes.previewURL}>Preview Me!</a>)}
+
                     <p className="first-line">{this.state.attributes.excerpts}</p>
     
-                        <p>Average Rating: {this.state.attributes.avgRating}</p>  
+                    <p>Average Rating: {this.state.attributes.avgRating}</p>  
                 </div>)
         } else {
 

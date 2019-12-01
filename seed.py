@@ -87,11 +87,11 @@ def load_ratings():
     Rating.query.delete()
 
     filename_prefix = 'seed_data/splitfile_'
-    filename_num = '1'
+    filename_num = 1
     filename_suffix = '.csv'
 
-    while int(filename_num) <= 2:
-        filename = filename_prefix + filename_num + filename_suffix
+    while filename_num <= 2:
+        filename = filename_prefix + str(filename_num) + filename_suffix
 
         with open(filename, encoding='utf-16') as csvfile:
             try:
@@ -104,6 +104,7 @@ def load_ratings():
             next(csvfile) #skips first row of the csv file
 
             counter = 0
+            how_many = 1
             for row in reader:
                 book_id = row[1]
                 user_id = row[0]
@@ -127,10 +128,14 @@ def load_ratings():
                     counter += 1
 
                 if counter > 999 and counter % 1000 == 0:
-                    print("Commiting new objects")
+                    print("Committing new objects")
+                    print("Committed", how_many, "times")
                     db.session.commit()
+                    how_many +=1
                     
             db.session.commit()
+            filename_num += 1
+            print("Starting file #", filename_num)
 
 
 
