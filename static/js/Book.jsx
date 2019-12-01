@@ -41,10 +41,13 @@ class Book extends React.Component {
 
                     {this.state.attributes.summary && 
                             (<p className='summary'>{this.state.attributes.summary}</p>)}
+
                     {this.state.attributes.previewURL && 
                             (<a href={this.state.attributes.previewURL}>Preview Me!</a>)}
 
-                    <p className="first-line">{this.state.attributes.excerpts}</p>
+                    {this.state.attributes.excerpts && 
+                        (<blockquote className="first-line">{this.state.attributes.excerpts}</blockquote>)}
+                        
                     {this.state.attributes.avgRating && 
                         (<p>Average Rating: {this.state.attributes.avgRating}</p>)}
                       
