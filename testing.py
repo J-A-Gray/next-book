@@ -1,10 +1,19 @@
-import unittest 
+import unittest, json
 
 from server import app
-from database_functions import get_last_user_id, add_anon_user, get_last_rating_id, get_book_id, add_rating, create_user_set, create_neighbors_book_dict, get_recommendations_lst, get_books_by_author, get_book_by_title, get_book_by_book_id, create_authors_dict, get_n_popular_books
-from model import db, Serializer, User, Book, Rating, init_app, example_data, connect_to_db
+
+from database_functions import (get_last_user_id, add_anon_user, 
+                                get_last_rating_id, get_book_id, add_rating, 
+                                create_user_set, create_neighbors_book_dict, 
+                                get_recommendations_lst, get_books_by_author, 
+                                get_book_by_title, get_book_by_book_id, 
+                                create_authors_dict, get_n_popular_books)
+
+from model import (db, Serializer, User, Book, Rating, init_app, example_data, 
+                   connect_to_db)
+
 from outward import write_rating_data
-import json
+
 
 class NextBookTests(unittest.TestCase):
     """Test NextBook site"""
