@@ -356,7 +356,7 @@ def display_top_books():
 
 @app.route('/recommendations', methods=['GET'])
 def display_recommended_books():
-    print('rec route hit')
+
     user_id = session.get('user_id')
     neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
     
@@ -435,15 +435,7 @@ def display_recommended_books():
 
 
 if __name__ == "__main__": # pragma: no cover
-    # We have to set debug=True here, since it has to be True at the
-    # point that we invoke the DebugToolbarExtension
-    app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-    app.debug = True
-    # # make sure templates, etc. are not cached in debug mode
-    app.jinja_env.auto_reload = app.debug
+
     connect_to_db(app)
 
-    # Use the DebugToolbar
-    DebugToolbarExtension(app)
-
-    app.run(port=5000, host='0.0.0.0')
+    app.run()
