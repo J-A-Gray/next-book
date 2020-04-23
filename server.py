@@ -356,7 +356,7 @@ def display_top_books():
 
 @app.route('/recommendations', methods=['GET'])
 def display_recommended_books():
-
+    print('rec route hit')
     user_id = session.get('user_id')
     neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
     
