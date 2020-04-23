@@ -22,12 +22,11 @@ from utils import convert_row_to_dict, get_info_google_books, get_info_open_libr
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-GBOOKS_key = os.environ.get("GBOOKS")
-# app_secret_key = os.environ.get("APPSECRET_KEY")
+GBOOKS_KEY = os.environ.get("GBOOKS")
+
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "ABC"
-# app.secret_key = os.environ.get("APPSECRET_KEY")
+app.secret_key = os.environ.get("APPSECRET_KEY")
 
 
 # Normally, if you use an undefined variable in Jinja2, it fails
@@ -136,7 +135,7 @@ def get_info_by_book_id(book_id):
         open_lib_info = get_info_open_library(book)
 
         #get book info from Google Books
-        google_books_info = get_info_google_books(book, GBOOKS_key)
+        google_books_info = get_info_google_books(book, GBOOKS_KEY)
 
 
         rating_scores = [r.score for r in book.ratings]
@@ -166,7 +165,7 @@ def serve_info_by_book_id(book_id):
         open_lib_info = get_info_open_library(book)
 
         #get book info from Google Books
-        google_books_info = get_info_google_books(book, GBOOKS_key)
+        google_books_info = get_info_google_books(book, GBOOKS_KEY)
 
 
         rating_scores = [r.score for r in book.ratings]
@@ -387,7 +386,7 @@ def display_recommended_books():
 
         #get summary, genres and cover image from Google Books
         url = "https://www.googleapis.com/books/v1/volumes"
-        payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_key}
+        payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_KEY}
         
 
         response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
