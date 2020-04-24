@@ -461,15 +461,21 @@ def send_test_message():
     if request.method == 'POST':
         phone_num = request.form.get("phone-num")
         print(request.form)
-        first_book = Book.query.get(int(request.form.get("book-id")))
-
-        message = f"""Hi! Your next book is:
-                      {first_book.title}
-                      by
-                      {first_book.author}
-
-                    Happy reading!
-                   """
+        books = request.form.get("book-id").split(", ")
+     
+        # first_book = Book.query.get(int(request.form.get("book-id")))
+        message ="""We think you'd like:
+        """
+        for book_id in books:
+            book = Book.query.get(int(book_id))
+            message += f"""
+                          {book.title}
+                          by
+                          {book.author}
+                    """
+        message += """
+                          Happy reading! 📖"""
+        print(message)
         send_message(twilio_client, 
                      phone_num=phone_num, 
                      messaging_service_sid=messaging_service_sid, 
