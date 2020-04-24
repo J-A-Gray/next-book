@@ -97,11 +97,11 @@ def create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, 
 
         return book_dict
 
-def send_message(twilio_client, phone_num: str, messaging_service_sid: str):
+def send_message(twilio_client, phone_num: str, messaging_service_sid: str, body):
 
     message = twilio_client.messages \
     .create(
-         body="Welcome to Miss Your Stop",
+         body=body,
          messaging_service_sid=messaging_service_sid,
          to=phone_num
      )

@@ -371,79 +371,83 @@ def display_top_books():
 
 @app.route('/recommendations', methods=['GET'])
 def display_recommended_books():
-    print('rec route hit')
+
     user_id = session.get('user_id')
-    neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
+    # neighbors_lst = get_nearest_neighbors(int(user_id)) #from ml.py
     
-    #from database_functions.py
-    user_book_lst = create_user_set(int(user_id))
-    neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
-    recommendation_lst = get_recommendations_lst(neighbors_dict)
-    print(recommendation_lst)
+    # #from database_functions.py
+    # user_book_lst = create_user_set(int(user_id))
+    # neighbors_dict = create_neighbors_book_dict(neighbors_lst, user_book_lst, 5)
+    # recommendation_lst = get_recommendations_lst(neighbors_dict)
+    # print(recommendation_lst)
 
-    recommendation_info_dict = {}
-    recommendation_link_dict = {}
+    # recommendation_info_dict = {}
+    # recommendation_link_dict = {}
     
-    for book in recommendation_lst: # pragma: no cover
+    # for book in recommendation_lst: # pragma: no cover
         
-        #library.link requires isbn-13, so convert book.isbn to isbn-13
-        isbn13 = convert_isbn(book.isbn)
+    #     #library.link requires isbn-13, so convert book.isbn to isbn-13
+    #     isbn13 = convert_isbn(book.isbn)
 
-        #use isbn-13 to get url for nearby library search
-        library_link_url = "https://labs.library.link/services/borrow/"
-        payload = {"isbn": "{}".format(isbn13), "embed": "true"}
+    #     #use isbn-13 to get url for nearby library search
+    #     library_link_url = "https://labs.library.link/services/borrow/"
+    #     payload = {"isbn": "{}".format(isbn13), "embed": "true"}
 
-        response = requests.get(library_link_url, params=payload)
+    #     response = requests.get(library_link_url, params=payload)
         
-        #Add book_id and url to a link dictionary
-        recommendation_link_dict[book.book_id] = response.url
-        
-
-        #get summary, genres and cover image from Google Books
-        url = "https://www.googleapis.com/books/v1/volumes"
-        payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_KEY}
+    #     #Add book_id and url to a link dictionary
+    #     recommendation_link_dict[book.book_id] = response.url
         
 
-        response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-
-        #convert to json
-        book_json = response.json()
-
-        #if there were results from the Google Books call
-        #add to book_id and the json to a dictionary
-        if book_json["totalItems"] > 0: 
-            recommendation_info_dict[book.book_id] = book_json
-
-        #begin Open Library API call
-        open_library_url = "https://openlibrary.org/api/books"
-        payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
-
-        response_ol = requests.get(open_library_url, params=payload)
-        if response_ol:
-            rec_excerpt_dict = {}
-            response_ol_json = response_ol.json()
-            isbnstring = "ISBN:{}".format(isbn13)
-            if 'excerpts' in response_ol_json[isbnstring]:
-                excerpt = response_ol_json[isbnstring]['excerpts'][0]['text']
-                rec_excerpt_dict[book.book_id] = excerpt
-        # else:
+    #     #get summary, genres and cover image from Google Books
+    #     url = "https://www.googleapis.com/books/v1/volumes"
+    #     payload = {"q": "isbn:{}".format(book.isbn), "key": GBOOKS_KEY}
         
-        #     #use isbn-13 to get url for nearby library search
-        #     open_library_url = "https://openlibrary.org/api/books"
-        #     payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
 
-        #     response_ol = requests.get(open_library_url, params=payload)
-        #     if response_ol:
-        #         response_ol_json = response_ol.json()
-        #         print(response_ol_json)
+    #     response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
 
-        #         recommendation_info_dict[book.book_id] = response_ol_json
+    #     #convert to json
+    #     book_json = response.json()
+
+    #     #if there were results from the Google Books call
+    #     #add to book_id and the json to a dictionary
+    #     if book_json["totalItems"] > 0: 
+    #         recommendation_info_dict[book.book_id] = book_json
+
+    #     #begin Open Library API call
+    #     open_library_url = "https://openlibrary.org/api/books"
+    #     payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
+
+    #     response_ol = requests.get(open_library_url, params=payload)
+    #     if response_ol:
+    #         rec_excerpt_dict = {}
+    #         response_ol_json = response_ol.json()
+    #         isbnstring = "ISBN:{}".format(isbn13)
+    #         if 'excerpts' in response_ol_json[isbnstring]:
+    #             excerpt = response_ol_json[isbnstring]['excerpts'][0]['text']
+    #             rec_excerpt_dict[book.book_id] = excerpt
+    #     # else:
+        
+    #     #     #use isbn-13 to get url for nearby library search
+    #     #     open_library_url = "https://openlibrary.org/api/books"
+    #     #     payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
+
+    #     #     response_ol = requests.get(open_library_url, params=payload)
+    #     #     if response_ol:
+    #     #         response_ol_json = response_ol.json()
+    #     #         print(response_ol_json)
+
+    #     #         recommendation_info_dict[book.book_id] = response_ol_json
 
     user = User.query.get(user_id)
     if user.email == None: #only registered users have emails, so we want to logout the anon user
         del session['user_id']
-   
 
+    #mock section for developement
+    recommendation_lst =[Book.query.get(2555), Book.query.get(236), Book.query.get(7), Book.query.get(155), Book.query.get(55)]    
+    recommendation_info_dict = {2555: {'kind': 'books#volumes', 'totalItems': 1, 'items': [{'kind': 'books#volume', 'id': '89-2ZXYsuAQC', 'etag': 'Tf1jPhK65Fc', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/89-2ZXYsuAQC', 'volumeInfo': {'title': 'Kindred', 'authors': ['Octavia E. Butler'],'publisher': 'Beacon Press', 'publishedDate': '1988', 'description': "Dana, a black woman, finds herself repeatedly transported to the antebellum South, where she must make sure that Rufus, the plantation owner's son, survives to father Dana's ancestor.", 'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': '0807083690'}, {'type': 'ISBN_13', 'identifier': '9780807083697'}], 'readingModes': {'text': True, 'image': False}, 'pageCount': 287, 'printType': 'BOOK', 'categories': ['Fiction'], 'averageRating': 4, 'ratingsCount': 175, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': True, 'contentVersion': '1.7.5.0.preview.2', 'panelizationSummary': {'containsEpubBubbles': False, 'containsImageBubbles': False}, 'imageLinks': {'smallThumbnail': 'http://books.google.com/books/content?id=89-2ZXYsuAQC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api', 'thumbnail': 'http://books.google.com/books/content?id=89-2ZXYsuAQC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'}, 'language': 'en', 'previewLink': 'http://books.google.com/books?id=89-2ZXYsuAQC&printsec=frontcover&dq=isbn:0807083690&hl=&cd=1&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=89-2ZXYsuAQC&dq=isbn:0807083690&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/Kindred.html?hl=&id=89-2ZXYsuAQC'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'PARTIAL', 'embeddable': True, 'publicDomain': False, 'textToSpeechPermission': 'ALLOWED', 'epub': {'isAvailable': True, 'acsTokenLink': 'http://books.google.com/books/download/Kindred-sample-epub.acsm?id=89-2ZXYsuAQC&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api'}, 'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=89-2ZXYsuAQC&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'SAMPLE', 'quoteSharingAllowed': False}, 'searchInfo': {'textSnippet': 'Dana, a black woman, finds herself repeatedly transported to the antebellum South, where she must make sure that Rufus, the plantation owner&#39;s son, survives to father Dana&#39;s ancestor.'}}]}, 236: {'kind': 'books#volumes', 'totalItems': 1, 'items': [{'kind': 'books#volume', 'id': 'lI_2H3GUulEC', 'etag': 'Y8AyhwldVOw', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/lI_2H3GUulEC', 'volumeInfo': {'title': 'Into Thin Air', 'subtitle': 'A Personal Account of the Mount Everest Disaster', 'authors': ['Jon Krakauer'], 'publisher': 'Anchor Books', 'publishedDate': '1999', 'description': 'The author describes his spring 1996 trek to Mt. Everest, a disastrous expedition that claimed the lives of eight climbers, and explains why he survived', 'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': '0385494785'}, {'type': 'ISBN_13', 'identifier': '9780385494786'}], 'readingModes': {'text': False, 'image': False}, 'pageCount': 332, 'printType': 'BOOK', 'categories': ['Biography & Autobiography'], 'averageRating': 4, 'ratingsCount': 217, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': False, 'contentVersion': '0.0.1.0.preview.0', 'imageLinks': {'smallThumbnail': 'http://books.google.com/books/content?id=lI_2H3GUulEC&printsec=frontcover&img=1&zoom=5&source=gbs_api', 'thumbnail': 'http://books.google.com/books/content?id=lI_2H3GUulEC&printsec=frontcover&img=1&zoom=1&source=gbs_api'}, 'language': 'en', 'previewLink': 'http://books.google.com/books?id=lI_2H3GUulEC&dq=isbn:0385494785&hl=&cd=1&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=lI_2H3GUulEC&dq=isbn:0385494785&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/Into_Thin_Air.html?hl=&id=lI_2H3GUulEC'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'NO_PAGES', 'embeddable': False, 'publicDomain': False, 'textToSpeechPermission': 'ALLOWED', 'epub': {'isAvailable': False}, 'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=lI_2H3GUulEC&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'NONE', 'quoteSharingAllowed': False}, 'searchInfo': {'textSnippet': 'The author describes his spring 1996 trek to Mt. Everest, a disastrous expedition that claimed the lives of eight climbers, and explains why he survived'}}]}, 7: {'kind': 'books#volumes', 'totalItems': 2, 'items': [{'kind': 'books#volume', 'id': 'dPQetAEACAAJ', 'etag': 'QPcoFunpa88', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/dPQetAEACAAJ', 'volumeInfo': {'title': 'The Hobbit', 'authors': ['John Ronald Reuel Tolkien'], 'publishedDate': '1937', 'description': 'Bilbo Baggins, a respectable, well-to-do hobbit, lives comfortably in his hobbit-hole until the day the wandering wizard Gandalf chooses him to share in an adventure from which he may never return.', 'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': '0618260307'}, {'type': 'ISBN_13', 'identifier': '9780618260300'}], 'readingModes': {'text': False, 'image': False}, 'pageCount': 365, 'printType': 'BOOK', 'categories': ['Baggins, Bilbo (Fictitious character)'], 'averageRating': 4, 'ratingsCount': 2535, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': False, 'contentVersion': 'preview-1.0.0', 'panelizationSummary': {'containsEpubBubbles': False, 'containsImageBubbles': False}, 'language': 'en', 'previewLink': 'http://books.google.com/books?id=dPQetAEACAAJ&dq=isbn:0618260307&hl=&cd=1&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=dPQetAEACAAJ&dq=isbn:0618260307&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/The_Hobbit.html?hl=&id=dPQetAEACAAJ'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'NO_PAGES', 'embeddable': False, 'publicDomain': False, 'textToSpeechPermission': 'ALLOWED', 'epub': {'isAvailable': False},'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=dPQetAEACAAJ&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'NONE', 'quoteSharingAllowed': False}, 'searchInfo': {'textSnippet': 'Bilbo Baggins, a respectable, well-to-do hobbit, lives comfortably in his hobbit-hole until the day the wandering wizard Gandalf chooses him to share in an adventure from which he may never return.'}}, {'kind': 'books#volume', 'id': 'ljWL5A7D2JAC', 'etag': 'lGoaIq3h9LU', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/ljWL5A7D2JAC', 'volumeInfo': {'title': 'The Hobbit, Or, There and Back Again', 'authors': ['John Ronald Reuel Tolkien'], 'publisher': 'Houghton Mifflin Harcourt', 'publishedDate': '2001', 'description': 'A newly rejacketed edition of the classic tale chronicles the adventures of the inhabitants of Middle-earth and of Bilbo Baggins, the hobbit who brought home to The Shire the One Ring of Power.', 'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': '0618260307'}, {'type': 'ISBN_13', 'identifier': '9780618260300'}], 'readingModes': {'text': False, 'image': False}, 'pageCount': 365, 'printType': 'BOOK', 'categories': ['Juvenile Fiction'], 'averageRating': 4, 'ratingsCount': 2629, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': False, 'contentVersion': '2.1.1.0.preview.0', 'imageLinks': {'smallThumbnail': 'http://books.google.com/books/content?id=ljWL5A7D2JAC&printsec=frontcover&img=1&zoom=5&source=gbs_api', 'thumbnail': 'http://books.google.com/books/content?id=ljWL5A7D2JAC&printsec=frontcover&img=1&zoom=1&source=gbs_api'}, 'language': 'en','previewLink': 'http://books.google.com/books?id=ljWL5A7D2JAC&pg=PP1&dq=isbn:0618260307&hl=&cd=2&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=ljWL5A7D2JAC&dq=isbn:0618260307&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/The_Hobbit_Or_There_and_Back_Again.html?hl=&id=ljWL5A7D2JAC'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'NO_PAGES', 'embeddable': False, 'publicDomain': False, 'textToSpeechPermission': 'ALLOWED', 'epub': {'isAvailable': False}, 'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=ljWL5A7D2JAC&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'NONE', 'quoteSharingAllowed': False}}]}, 155: {'kind': 'books#volumes', 'totalItems': 1, 'items': [{'kind': 'books#volume', 'id': 'lC_E8Hz-8rIC', 'etag': 'g6cbWymQPGo', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/lC_E8Hz-8rIC', 'volumeInfo': {'title': 'The Two Towers', 'authors': ['John Ronald Reuel Tolkien'], 'publisher': 'Mariner Books', 'publishedDate': '2003', 'description': 'After losing Gandalf and being divided from their other companions during an Orc attack, Frodo and Sam continue towards Mordor, Land of the Enemy, to destroy the Ring, accompanied only by a mysterious figure that follows them.', 'industryIdentifiers': [{'type': 'ISBN_10', 'identifier': '0618346260'}, {'type': 'ISBN_13', 'identifier': '9780618346264'}], 'readingModes': {'text': False, 'image': False}, 'pageCount': 725, 'printType': 'BOOK', 'categories': ['Fiction'], 'averageRating': 4, 'ratingsCount': 1219, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': False, 'contentVersion': '0.1.2.0.preview.0', 'panelizationSummary': {'containsEpubBubbles': False, 'containsImageBubbles': False}, 'imageLinks': {'smallThumbnail': 'http://books.google.com/books/content?id=lC_E8Hz-8rIC&printsec=frontcover&img=1&zoom=5&source=gbs_api', 'thumbnail': 'http://books.google.com/books/content?id=lC_E8Hz-8rIC&printsec=frontcover&img=1&zoom=1&source=gbs_api'}, 'language': 'en', 'previewLink': 'http://books.google.com/books?id=lC_E8Hz-8rIC&dq=isbn:0618346260&hl=&cd=1&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=lC_E8Hz-8rIC&dq=isbn:0618346260&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/The_Two_Towers.html?hl=&id=lC_E8Hz-8rIC'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'NO_PAGES', 'embeddable': False, 'publicDomain': False, 'textToSpeechPermission': 'ALLOWED', 'epub': {'isAvailable': False}, 'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=lC_E8Hz-8rIC&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'NONE', 'quoteSharingAllowed': False}, 'searchInfo': {'textSnippet': 'After losing Gandalf and being divided from their other companions during an Orc attack, Frodo and Sam continue towards Mordor, Land of the Enemy, to destroy the Ring, accompanied only by a mysterious figure that follows them.'}}]}, 55: {'kind': 'books#volumes', 'totalItems': 1, 'items': [{'kind': 'books#volume', 'id': '5H46PcnDCYMC', 'etag': 'wiAfjfjSG4U', 'selfLink': 'https://www.googleapis.com/books/v1/volumes/5H46PcnDCYMC', 'volumeInfo': {'title': 'Brave New World', 'authors': ['Aldous Huxley'], 'publisher': 'Harper Collins', 'publishedDate': '1998-09', 'description': "Huxley's classic prophetic novel describes the socialized horrors of a futuristic utopia devoid of individual freedom", 'industryIdentifiers': [{'type': 'ISBN_13', 'identifier': '9780060929879'}, {'type': 'ISBN_10', 'identifier': '0060929871'}], 'readingModes': {'text': False, 'image': False}, 'pageCount': 268, 'printType': 'BOOK', 'categories': ['Fiction'], 'averageRating': 3.5, 'ratingsCount': 2983, 'maturityRating': 'NOT_MATURE', 'allowAnonLogging': False, 'contentVersion': 'preview-1.0.0', 'panelizationSummary': {'containsEpubBubbles': False, 'containsImageBubbles': False}, 'imageLinks': {'smallThumbnail': 'http://books.google.com/books/content?id=5H46PcnDCYMC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api', 'thumbnail': 'http://books.google.com/books/content?id=5H46PcnDCYMC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'}, 'language': 'en', 'previewLink': 'http://books.google.com/books?id=5H46PcnDCYMC&printsec=frontcover&dq=isbn:0060929871&hl=&cd=1&source=gbs_api', 'infoLink': 'http://books.google.com/books?id=5H46PcnDCYMC&dq=isbn:0060929871&hl=&source=gbs_api', 'canonicalVolumeLink': 'https://books.google.com/books/about/Brave_New_World.html?hl=&id=5H46PcnDCYMC'}, 'saleInfo': {'country': 'US', 'saleability': 'NOT_FOR_SALE', 'isEbook': False}, 'accessInfo': {'country': 'US', 'viewability': 'PARTIAL', 'embeddable': True, 'publicDomain':False, 'textToSpeechPermission': 'ALLOWED_FOR_ACCESSIBILITY', 'epub': {'isAvailable': False}, 'pdf': {'isAvailable': False}, 'webReaderLink': 'http://play.google.com/books/reader?id=5H46PcnDCYMC&hl=&printsec=frontcover&source=gbs_api', 'accessViewStatus': 'SAMPLE', 'quoteSharingAllowed': False}, 'searchInfo': {'textSnippet': 'Huxley&#39;s classic prophetic novel describes the socialized horrors of a futuristic utopia devoid of individual freedom'}}]}}
+    recommendation_link_dict = {2555: 'https://labs.library.link/services/borrow/?isbn=9780807083697&embed=true', 236: 'https://labs.library.link/services/borrow/?isbn=9780385494786&embed=true', 7: 'https://labs.library.link/services/borrow/?isbn=9780618260300&embed=true', 155: 'https://labs.library.link/services/borrow/?isbn=9780618346264&embed=true', 55: 'https://labs.library.link/services/borrow/?isbn=9780060929879&embed=true'}
+    rec_excerpt_dict = {}
 
     return render_template('recommendations.html', 
                             recommendation_lst=recommendation_lst,
@@ -454,8 +458,17 @@ def display_recommended_books():
 @app.route('/test', methods=['GET', 'POST'])
 def send_test_message():
     if request.method == 'POST':
-        send_message(twilio_client, phone_num="+15103886472", 
-                     messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b')
+        phone_num = request.form.get("phone-num")
+        print(request.form)
+        first_book = request.form.get("book-id")
+
+        message = f"""Hi! Your next book is:
+                      {first_book}
+
+                    Happy reading!
+                   """
+        send_message(twilio_client, phone_num=phone_num, 
+                     messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b', body=message)
 
     return render_template('message_sent.html')
 
