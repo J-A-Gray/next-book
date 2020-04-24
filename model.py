@@ -62,7 +62,7 @@ class Rating(db.Model):
     __tablename__ = "ratings"
 
     rating_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
+    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     score = db.Column(db.Integer)
 
@@ -80,9 +80,8 @@ class Rating(db.Model):
 ##############################################################################
 # Helper functions
 def init_app(): # pragma: no cover
-    from flask import Flask
-    app = Flask(__name__)
-
+    from server import app
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     connect_to_db(app)
     print("Connected to DB.")
 
@@ -149,7 +148,6 @@ def connect_to_db(app, db_uri='postgresql:///nextbook'):
 if __name__ == "__main__": # pragma: no cover
     # As a convenience, if we run this module interactively, it will leave
     # you in a state of being able to work with the database directly.
-
-    from server import app
+    
     init_app()
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+   

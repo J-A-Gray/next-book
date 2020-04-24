@@ -445,12 +445,18 @@ def display_recommended_books():
    
 
 
-    return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict, rec_excerpt_dict=rec_excerpt_dict)
+    return render_template('recommendations.html', 
+                            recommendation_lst=recommendation_lst,
+                            recommendation_info_dict=recommendation_info_dict,
+                            recommendation_link_dict=recommendation_link_dict,
+                            rec_excerpt_dict=rec_excerpt_dict)
 
-@app.route('/test')
+@app.route('/test', methods=['GET', 'POST'])
 def send_test_message():
+    if request.method == 'POST':
+        send_message(twilio_client, phone_num="+15103886472", 
+                     messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b')
 
-    send_message(twilio_client, phone_num="+15103886472", messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b')
     return render_template('message_sent.html')
 
 if __name__ == "__main__": # pragma: no cover
