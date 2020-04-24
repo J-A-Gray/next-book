@@ -2,28 +2,37 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, request, flash, redirect, session, jsonify
+from flask import (Flask, render_template, request, flash, redirect, session,
+                   jsonify)
+
 from flask_debugtoolbar import DebugToolbarExtension
+
 import os
 import requests
 import urllib3
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from pyisbn import convert as convert_isbn
+from twilio.rest import Client
 
 
 from model import connect_to_db, db, User, Book, Rating
 from outward import write_rating_data
 from ml import get_nearest_neighbors
-from database_functions import add_anon_user, get_last_user_id, get_last_rating_id, get_book_id, add_rating, create_user_set, create_neighbors_book_dict, get_recommendations_lst, get_book_by_title, get_books_by_author, get_book_by_book_id, create_authors_dict, get_n_popular_books
-from utils import convert_row_to_dict, get_info_google_books, get_info_open_library, create_combined_book_info_dict
+from database_functions import (add_anon_user, get_last_user_id,
+                                get_last_rating_id, get_book_id, add_rating,
+                                create_user_set, create_neighbors_book_dict,
+                                get_recommendations_lst, get_book_by_title,
+                                get_books_by_author, get_book_by_book_id,
+                                create_authors_dict, get_n_popular_books)
+
+from utils import (convert_row_to_dict, get_info_google_books,
+                   get_info_open_library, create_combined_book_info_dict,
+                   send_message)
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-GBOOKS_KEY = os.environ.get("GBOOKS")
-
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = os.environ.get("APPSECRET_KEY")
@@ -34,6 +43,13 @@ app.secret_key = os.environ.get("APPSECRET_KEY")
 # error.
 app.jinja_env.undefined = StrictUndefined
 
+twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+
+twilio_client = Client(twilio_account_sid, twilio_auth_token)
+
+
+GBOOKS_KEY = os.environ.get("GBOOKS")
 
 @app.route('/')
 def index():
@@ -97,7 +113,6 @@ def login_process():
     else:
         flash("Try Again")
         return redirect('/login')
-
 
 
 @app.route('/logout')
@@ -432,7 +447,11 @@ def display_recommended_books():
 
     return render_template('recommendations.html', recommendation_lst=recommendation_lst, recommendation_info_dict=recommendation_info_dict, recommendation_link_dict=recommendation_link_dict, rec_excerpt_dict=rec_excerpt_dict)
 
+@app.route('/test')
+def send_test_message():
 
+    send_message(twilio_client, phone_num="+15103886472", messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b')
+    return render_template('message_sent.html')
 
 if __name__ == "__main__": # pragma: no cover
     # We have to set debug=True here, since it has to be True at the
@@ -446,4 +465,4 @@ if __name__ == "__main__": # pragma: no cover
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run(port=5000, host='0.0.0.0')
+    app.run(port=5001, host='0.0.0.0')
