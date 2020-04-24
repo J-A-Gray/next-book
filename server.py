@@ -45,6 +45,7 @@ app.jinja_env.undefined = StrictUndefined
 
 twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+messaging_service_sid = os.environ.get('TWILIO_MESSAGING_SERVICE_SID')
 
 twilio_client = Client(twilio_account_sid, twilio_auth_token)
 
@@ -460,15 +461,19 @@ def send_test_message():
     if request.method == 'POST':
         phone_num = request.form.get("phone-num")
         print(request.form)
-        first_book = request.form.get("book-id")
+        first_book = Book.query.get(int(request.form.get("book-id")))
 
         message = f"""Hi! Your next book is:
-                      {first_book}
+                      {first_book.title}
+                      by
+                      {first_book.author}
 
                     Happy reading!
                    """
-        send_message(twilio_client, phone_num=phone_num, 
-                     messaging_service_sid='MG6107599aad35c1f8bd478d2e7ec24a9b', body=message)
+        send_message(twilio_client, 
+                     phone_num=phone_num, 
+                     messaging_service_sid=messaging_service_sid, 
+                     body=message)
 
     return render_template('message_sent.html')
 
