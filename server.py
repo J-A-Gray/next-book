@@ -28,7 +28,7 @@ from database_functions import (add_anon_user, get_last_user_id,
 
 from utils import (convert_row_to_dict, get_info_google_books,
                    get_info_open_library, create_combined_book_info_dict,
-                   send_message)
+                   send_message, create_rec_message)
 
 
 app = Flask(__name__)
@@ -459,25 +459,12 @@ def display_recommended_books():
 @app.route('/test', methods=['GET', 'POST'])
 def send_test_message():
     if request.method == 'POST':
-        phone_num = request.form.get("phone-num")
         print(request.form)
-        books = request.form.get("book-id").split(", ")
-     
-        # first_book = Book.query.get(int(request.form.get("book-id")))
-        message ="""We think you'd like:
-        """
-        for book_id in books:
-            book = Book.query.get(int(book_id))
-            message += f"""
-                          {book.title}
-                          by
-                          {book.author}
-                    """
-        message += """
-                          Happy reading! 📖"""
-        print(message)
+
+        message = create_rec_message(books=request.form.get("book-id").split(", "))
+
         send_message(twilio_client, 
-                     phone_num=phone_num, 
+                     phone_num=request.form.get("phone-num"), 
                      messaging_service_sid=messaging_service_sid, 
                      body=message)
 

@@ -1,5 +1,6 @@
 import requests
 from pyisbn import convert as convert_isbn
+from model import User, Book, Rating
 
 def convert_row_to_dict(row):
     row_dict = {}
@@ -76,7 +77,11 @@ def get_info_open_library(book):
 
     return book_info_dict
 
-def create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book):
+def create_combined_book_info_dict(open_lib_info, 
+                                   google_books_info, 
+                                   book_dict, 
+                                   avg_rating, 
+                                   book):
 
         book_dict["genres"] = open_lib_info['genres']
         book_dict["excerpts"] = open_lib_info['excerpts']
@@ -97,7 +102,11 @@ def create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, 
 
         return book_dict
 
-def send_message(twilio_client, phone_num: str, messaging_service_sid: str, body):
+def send_message(twilio_client,
+                 phone_num: str, 
+                 messaging_service_sid: str, 
+                 body):
+    """Send text message via twilio."""
 
     message = twilio_client.messages \
     .create(
@@ -107,3 +116,21 @@ def send_message(twilio_client, phone_num: str, messaging_service_sid: str, body
      )
 
     print(f'message sent to {phone_num}')
+
+def create_rec_message(books):
+    """Create a book recommendation message to text."""
+    
+    message ="""We think you'd like:
+        """
+    for book_id in books:
+        book = Book.query.get(int(book_id))
+        message += f"""
+                      {book.title}
+                      by
+                      {book.author}
+                """
+    message += """
+                      Happy reading! 📖"""
+    print(message)
+
+    return message

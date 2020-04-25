@@ -1,6 +1,6 @@
 import unittest, json
 
-from server import app
+from server import app, GBOOKS_KEY
 
 from database_functions import (get_last_user_id, add_anon_user, 
                                 get_last_rating_id, get_book_id, add_rating, 
@@ -14,6 +14,9 @@ from model import (db, Serializer, User, Book, Rating, init_app, example_data,
 
 from outward import write_rating_data
 
+from utils import (convert_row_to_dict, get_info_google_books, 
+                   get_info_open_library, create_combined_book_info_dict, 
+                   create_rec_message)
 
 class NextBookTests(unittest.TestCase):
     """Test NextBook site"""
@@ -80,6 +83,7 @@ class NextBookTestsDatabase(unittest.TestCase):
         #Get the Flask test client
         self.client = app.test_client()
         app.config['TESTING'] = True
+        app.config['DEBUG'] = False
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
         #connect to test database
@@ -334,6 +338,14 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertIn('The Shock of the Fall', rec_lst[0].title)
         for item in rec_lst:
             self.assertIsInstance(item, Book)
+
+    def test_get_info_google_books(self):
+        """Test if valid google books response returns using a book object"""
+
+        book_info_dict = get_info_google_books(Book.query.get(3327), GBOOKS_KEY)
+        self.assertIn('totalItems', book_info_dict['response'])
+
+
 
 
 
