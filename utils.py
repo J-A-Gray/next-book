@@ -91,7 +91,7 @@ def create_combined_book_info_dict(open_lib_info,
         book_dict["previewURL"] = open_lib_info['previewURL']
         book_dict["authorLink"] = "/authors/" + book.author
         book_dict['titleLink'] = '/books/' + str(book.book_id)
-        print(book_dict)
+        # print(book_dict)
 
         if not book_dict["genres"]:
             book_dict["genres"] = google_books_info['genres']

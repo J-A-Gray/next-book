@@ -161,7 +161,9 @@ def get_info_by_book_id(book_id):
         else:
             avg_rating = None
 
-        book_dict = create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book)
+        book_dict = create_combined_book_info_dict(open_lib_info, 
+                                                   google_books_info, book_dict, 
+                                                   avg_rating, book)
 
         return jsonify(book_dict)
 
@@ -191,7 +193,9 @@ def serve_info_by_book_id(book_id):
         else:
             avg_rating = None
 
-        book_dict = create_combined_book_info_dict(open_lib_info, google_books_info, book_dict, avg_rating, book)
+        book_dict = create_combined_book_info_dict(open_lib_info, 
+                                                   google_books_info, book_dict, 
+                                                   avg_rating, book)
 
         return jsonify(book_dict)
 
