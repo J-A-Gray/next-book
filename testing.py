@@ -1,6 +1,6 @@
 import unittest, json
 
-from server import app
+from server import app, GBOOKS_KEY
 
 from database_functions import (get_last_user_id, add_anon_user, 
                                 get_last_rating_id, get_book_id, add_rating, 
@@ -14,6 +14,9 @@ from model import (db, Serializer, User, Book, Rating, init_app, example_data,
 
 from outward import write_rating_data
 
+from utils import (convert_row_to_dict, get_info_google_books, 
+                   get_info_open_library, create_combined_book_info_dict, 
+                   create_rec_message)
 
 class NextBookTests(unittest.TestCase):
     """Test NextBook site"""
@@ -77,9 +80,8 @@ class NextBookTestsDatabase(unittest.TestCase):
     def setUp(self):
         """Set up for database function testing"""
 
-        #Get the Flask test client
-        self.client = app.test_client()
         app.config['TESTING'] = True
+        app.config['DEBUG'] = False
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
         #connect to test database
@@ -127,39 +129,6 @@ class NextBookTestsDatabase(unittest.TestCase):
     #     self.assertIn(b"Login</button>", result.data)
     #     self.assertIn(b" Bye! Happy Reading!", result.data)
 
-    def test_search_by_author(self):
-        """Test if search by author route returns valid JSON response."""
-        result = self.client.get('/search-by-author.json', 
-                                    query_string={'author' : 'Henning Mankell'},
-                                    content_type='application/json')
-
-        json_data = json.loads(result.get_data(as_text=True))
-        
-
-        self.assertEqual(result.status_code, 200)
-        self.assertIn(b"The White Lioness", result.data)
-        self.assertEqual(json_data[0]['book_id'], 8387)
-
-    def test_search_by_title(self):
-        """Test if search by author route returns valid JSON response."""
-        result = self.client.get('/search-by-title.json', 
-                                    query_string={'title' : 'White Lioness'},
-                                    content_type='application/json')
-
-        json_data = json.loads(result.get_data(as_text=True))
-       
-        self.assertEqual(result.status_code, 200)
-        self.assertIn(b"Henning Mankell", result.data)
-        self.assertEqual(json_data[0]['book_id'], 8387)
-
-    def test_register_process(self):
-        """Test if new user can register"""
-        result = self.client.post('/register', data={'email': '911@test.com', 
-                                          'password': 'password' }, 
-                                          follow_redirects=True)
-        self.assertEqual(result.status_code, 200)
-        #redirects to login page if successful, so we'll test for that
-        self.assertIn(b"<h1>Login</h1>", result.data) 
 
     # def test_books(self):
     #     """Test that book list route is pulling data from the db and displaying on page """
@@ -193,22 +162,6 @@ class NextBookTestsDatabase(unittest.TestCase):
     #     self.assertEqual(result.status_code, 200)
     #     self.assertIn(b"<h1>Authors</h1>", result.data)
     #     self.assertIn(b"Nathan Filer</a>", result.data)
-
-    def test_individual_author_route(self):
-        """Test if individual author page pulls data from db and renders page"""
-        result = self.client.get('/authors/Nathan Filer')
-        self.assertEqual(result.status_code, 200)
-        self.assertIn(b">The Shock of the Fall</a>", result.data)
-        self.assertIn(b"<h1>Nathan Filer</h1>", result.data)
-
-    def test_individual_user_route(self):
-        """Test if individual user page pulls data from db and renders"""
-        result = self.client.get('/users/1')
-        self.assertEqual(result.status_code, 200)
-        self.assertIn(b"<h2>Books You\'ve Rated</h2>", result.data)
-        self.assertIn(b" <h1>User: 1 </h1>", result.data)
-
-
 
     # def test_search_process(self):
 
@@ -334,6 +287,121 @@ class NextBookTestsDatabase(unittest.TestCase):
         self.assertIn('The Shock of the Fall', rec_lst[0].title)
         for item in rec_lst:
             self.assertIsInstance(item, Book)
+
+    # def test_create_rec_mesage(self):
+
+
+
+class NextBookTestsDatabaseRequests(unittest.TestCase):
+
+    def setUp(self):
+        """Set up for database function testing"""
+
+        #Get the Flask test client
+        self.client = app.test_client()
+        app.config['TESTING'] = True
+        app.config['DEBUG'] = False
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+        #connect to test database
+        connect_to_db(app, db_uri='postgresql:///testbook') 
+
+        #create the tables and add the sample data
+        db.create_all()
+        example_data()
+
+        
+    def tearDown(self):
+        """Do at end of every test."""
+
+        db.session.close()
+        db.drop_all()
+
+    def test_search_by_author(self):
+        """Test if search by author route returns valid JSON response."""
+        result = self.client.get('/search-by-author.json', 
+                                    query_string={'author' : 'Henning Mankell'},
+                                    content_type='application/json')
+
+        json_data = json.loads(result.get_data(as_text=True))
+        
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"The White Lioness", result.data)
+        self.assertEqual(json_data[0]['book_id'], 8387)
+
+    def test_search_by_title(self):
+        """Test if search by author route returns valid JSON response."""
+        result = self.client.get('/search-by-title.json', 
+                                    query_string={'title' : 'White Lioness'},
+                                    content_type='application/json')
+
+        json_data = json.loads(result.get_data(as_text=True))
+       
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"Henning Mankell", result.data)
+        self.assertEqual(json_data[0]['book_id'], 8387)
+
+    def test_register_process(self):
+        """Test if new user can register"""
+        result = self.client.post('/register', data={'email': '911@test.com', 
+                                          'password': 'password' }, 
+                                          follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        #redirects to login page if successful, so we'll test for that
+        self.assertIn(b"<h1>Login</h1>", result.data)
+
+    def test_individual_author_route(self):
+        """Test if individual author page pulls data from db and renders page"""
+        result = self.client.get('/authors/Nathan Filer')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b">The Shock of the Fall</a>", result.data)
+        self.assertIn(b"<h1>Nathan Filer</h1>", result.data)
+
+    def test_individual_user_route(self):
+        """Test if individual user page pulls data from db and renders"""
+        result = self.client.get('/users/1')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn(b"<h2>Books You\'ve Rated</h2>", result.data)
+        self.assertIn(b" <h1>User: 1 </h1>", result.data)
+
+    def test_get_info_google_books(self):
+        """Test if valid google books response using a book object."""
+        #TODO use a mock for api response
+        book_info_dict = get_info_google_books(Book.query.get(3327), GBOOKS_KEY)
+        
+        self.assertIn('totalItems', book_info_dict['response'])
+
+    def test_get_info_open_library(self):
+        """Test if valid open library api response using a book object."""
+
+        book_info_dict = get_info_open_library(Book.query.get(69))
+
+        self.assertIn('ISBN:9780007442911', book_info_dict['response'])
+
+    def test_create_combined_book_info_dict(self):
+
+
+        book = Book.query.get(69)
+
+        google_books_info = get_info_google_books(book, GBOOKS_KEY)
+        open_lib_info = get_info_open_library(book)
+
+        book_dict = convert_row_to_dict(book)
+
+        rating_scores = [r.score for r in book.ratings]
+        if len(rating_scores) > 0:
+            avg_rating = float(sum(rating_scores))/len(rating_scores)
+            avg_rating = f"{avg_rating:.1f}"
+        else:
+            avg_rating = None
+
+        combined_book_dict = create_combined_book_info_dict(open_lib_info, 
+                                                   google_books_info, book_dict, 
+                                                   avg_rating, book)
+
+        self.assertIsInstance(combined_book_dict, dict)
+        self.assertIn('authorLink', combined_book_dict)
 
 
 

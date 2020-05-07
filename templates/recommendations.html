@@ -108,4 +108,25 @@
     </div>
 </div>
 
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 col-md-6 mx-auto">
+            <form action="test" method="POST" id="collect-phone">
+                <input type="radio" name="get-text" value="yes"id="yes">
+                <label for="yes">Sure, send me a text</label>
+                <div>
+                    <label for="phone-num">Number to text:</label>
+                    <input id="phone-num" name="phone-num" type="tel" required
+                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}">
+                    <span class="validity"></span>
+  </div>
+                <input type='radio' name='get-text' value='no' id='no'>
+                <label for='no'>Nah</label>
+                <input type="hidden" id="book-id" name="book-id" value="{{ recommendation_lst|map(attribute='book_id')|join(', ') }}">
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

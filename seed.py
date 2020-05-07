@@ -135,12 +135,9 @@ def load_ratings():
                     how_many +=1
                     
             db.session.commit()
-            print("Finished with file #" + filename_num)
+            print("Finished with file #" + str(filename_num))
             filename_num += 1
            
-
-
-
 
 def set_val_user_id():
     """Set value for the next user_id after seeding database"""
